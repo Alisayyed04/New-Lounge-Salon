@@ -98,8 +98,8 @@ export const getBookingById = async (req, res) => {
 
 export const getMyBookings = async (req, res) => {
   try {
-    const userId = req.params.id;
-    //const userId = req.user.id;
+    // const userId = req.params.id;
+    const userId = req.user.id;
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid ID" });
     }

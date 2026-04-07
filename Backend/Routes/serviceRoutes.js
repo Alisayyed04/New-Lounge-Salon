@@ -7,17 +7,18 @@ import {
   deleteService,
 } from "../Controllers/ServiceController.js";
 
+import { protect, authorizeRoles } from "../Middlewares/authMiddleware.js";
 const router = express.Router();
 
 //CREATE A SERVICE
-router.post("/", createService);
+router.post("/", protect, authorizeRoles("admin"), createService);
 //GET ALL SERVICES
 router.get("/", getServices);
 //GET SERVICE BY ID
 router.get("/:id", getServiceById);
 //UPDATE A SERVICE
-router.put("/:id", updateService);
+router.put("/:id", protect, authorizeRoles("admin"), updateService);
 //DELETE A SERVICE
-router.delete("/:id", deleteService);
+router.delete("/:id", protect, authorizeRoles("admin"), deleteService);
 
 export default router;
