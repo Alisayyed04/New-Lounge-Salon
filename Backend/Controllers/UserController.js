@@ -9,7 +9,8 @@ const userExists = async (email) => {
 
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone, address, profilePic, bookings } =
+      req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields required!" });
@@ -27,6 +28,10 @@ const registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      phone,
+      address,
+      profilePic: req.file?.path || null,
+      bookings,
     });
 
     await user.save();
