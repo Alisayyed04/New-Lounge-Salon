@@ -1,11 +1,5 @@
 import Service from "../Models/Services";
-import mongoose from "mongoose";
 
-if (!mongoose.Types.ObjectId.isValid(id)) {
-  return res.status(400).json({
-    message: "Invalid ID",
-  });
-}
 export const createService = async (req, res) => {
   try {
     const { name, description, price, duration, category, image, isActive } =
@@ -58,6 +52,9 @@ export const getServices = async (req, res) => {
 export const getServiceById = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
     const service = await Service.findById(id).populate("category");
 
     if (!service) {
@@ -80,6 +77,9 @@ export const getServiceById = async (req, res) => {
 export const updateService = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
     const updatedData = {
       ...req.body,
     };
@@ -108,6 +108,9 @@ export const updateService = async (req, res) => {
 export const deleteService = async (req, res) => {
   try {
     let { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
     let service = await Service.findByIdAndDelete(id);
 
     if (!service) {
