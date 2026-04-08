@@ -1,0 +1,63 @@
+import { useState } from "react"
+import axios from "axios"
+
+export default function LoginUser() {
+    const [formData, setFormData] = useState({
+        email: "",
+        password: "",
+    })
+
+    const handleFormData = (e) => {
+        setFormData((d) => {
+            return { ...d, [e.target.name]: e.target.value }
+        })
+    }
+
+    const handleForm = async (e) => {
+        e.preventDefault()
+        try {
+            const res = await axios.post(
+                "http://localhost:8080/api/users/login",
+                formData
+            )
+            console.log("success", res.data)
+
+            localStorage.setItem("token", res.data.token)
+
+            setFormData({
+                email: "",
+                password: "",
+            })
+        } catch (e) {
+            console.log("Error", e.response?.data || e.message)
+        }
+    }
+    return (
+        <>
+
+            <form onSubmit={handleForm}>
+
+
+                <label htmlFor="email">Email</label>
+                <input type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter Your Email"
+                    value={formData.email}
+                    onChange={handleFormData}
+                    required /><br></br>
+
+                <label htmlFor="pass">Password</label>
+                <input type="password"
+                    id="pass"
+                    name="password"
+                    required
+                    onChange={handleFormData}
+                    placeholder="Enter Password"
+                    value={formData.password}
+                    minLength="6" /><br></br>
+                <button>Submit</button>
+            </form>
+        </>
+    )
+}
