@@ -1,5 +1,5 @@
 import Service from "../Models/Services.js";
-
+import mongoose from "mongoose";
 export const createService = async (req, res) => {
   try {
     const { name, description, price, duration, category, image, isActive } =

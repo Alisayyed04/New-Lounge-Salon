@@ -2,7 +2,7 @@ import User from "../Models/User.js";
 import bcrypt from "bcrypt";
 import "dotenv/config";
 import jwt from "jsonwebtoken";
-
+import mongoose from "mongoose";
 const userExists = async (email) => {
   return User.findOne({ email });
 };

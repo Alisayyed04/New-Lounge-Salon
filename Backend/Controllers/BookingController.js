@@ -1,5 +1,5 @@
 import Booking from "../Models/Booking.js";
-
+import mongoose from "mongoose";
 export const createBooking = async (req, res) => {
   try {
     const {
@@ -13,7 +13,7 @@ export const createBooking = async (req, res) => {
       notes,
     } = req.body;
 
-    if (!user || !service || !staff || !date || !time) {
+    if (!user || !service || !date || !time) {
       return res.status(400).json({
         message: "Please fill all required fields",
       });

@@ -9,7 +9,9 @@ export default function ServiceCard({ service }) {
                 <p>{service.description}</p>
                 <h3>₹{service.price}</h3>
                 <p>{service.category}</p>
-                <button onClick={() => navigate(`/bookings/${service._id}`)}>Book Now</button>
+                <button onClick={() => navigate(`/bookings/${service._id}`)}>
+                    Book Now
+                </button>
                 <button>View Gallery</button>
 
             </div>
