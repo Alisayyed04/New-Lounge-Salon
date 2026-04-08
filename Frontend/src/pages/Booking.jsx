@@ -1,7 +1,10 @@
 import { useParams } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios"
+
 export default function Bookings() {
+    const navigate = useNavigate();
     const { id: ID } = useParams()
     let [serviceData, setServiceData] = useState({})
     let [formData, setFormData] = useState({
@@ -39,7 +42,7 @@ export default function Bookings() {
         e.preventDefault()
         try {
             const token = localStorage.getItem("token")
-            console.log("SENDING TOKEN:", token);
+
             const res = await axios.post("http://localhost:8080/api/bookings/",
                 {
                     ...formData,
@@ -109,7 +112,7 @@ export default function Bookings() {
                     // placeholder={Date().now}
                     // value={formData.date}
                     onChange={handleFormData} />
-                <button type="submit">Book Now</button>
+                <button onClick={() => navigate(`/dashboard`)}>Book Now</button>
             </form>
         </>
     )

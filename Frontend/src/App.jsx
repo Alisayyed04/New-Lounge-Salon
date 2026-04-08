@@ -4,6 +4,7 @@ import Services from "./pages/Services.jsx";
 import Navbar from "./components/navbar.jsx";
 import Home from "./pages/Home.jsx"
 import Booking from "./pages/Booking.jsx"
+import Dashboard from "./pages/Dashboard.jsx";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 
 function App() {
@@ -17,7 +18,7 @@ function App() {
         <Route path="/register" element={<RegisterUser />} />
         <Route path="/services" element={<Services />} />
         <Route path="/bookings/:id" element={<Booking />} />
-        <Route path="/dashboard" element={<h1>Dashboard Page</h1>} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
   );
