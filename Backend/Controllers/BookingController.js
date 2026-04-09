@@ -124,21 +124,58 @@ export const getMyBookings = async (req, res) => {
   }
 };
 
+// export const updateBookingStatus = async (req, res) => {
+//   try {
+//     const userId = req.user.id;
+//     const { id } = req.params;
+//     const { status } = req.body;
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return res.status(400).json({ message: "Invalid ID" });
+//     }
+//     const validStatuses = ["pending", "confirmed", "completed", "cancelled"];
+
+//     if (!validStatuses.includes(status)) {
+//       return res.status(400).json({
+//         message: "Invalid status value",
+//       });
+//     }
+//     const booking = await Booking.findById(id);
+
+//     if (!booking) {
+//       return res.status(404).json({
+//         message: "Booking not found",
+//       });
+//     }
+//     if (booking.user.toString() !== userId && req.user.role !== "admin") {
+//       return res.status(403).json({
+//         message: "Not authorized",
+//       });
+//     }
+//     booking.status = status;
+
+//     await booking.save();
+
+//     return res.status(200).json({
+//       message: "Booking status updated",
+//       data: booking,
+//     });
+//   } catch (e) {
+//     return res.status(500).json({
+//       message: "Server error",
+//     });
+//   }
+// };
+
 export const updateBookingStatus = async (req, res) => {
   try {
     const userId = req.user.id;
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, date, time, note } = req.body;
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid ID" });
     }
-    const validStatuses = ["pending", "confirmed", "completed", "cancelled"];
 
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({
-        message: "Invalid status value",
-      });
-    }
     const booking = await Booking.findById(id);
 
     if (!booking) {
@@ -146,22 +183,41 @@ export const updateBookingStatus = async (req, res) => {
         message: "Booking not found",
       });
     }
-    if (booking.user.toString() !== userId) {
+
+    // 🔒 only admin OR owner
+    if (booking.user.toString() !== userId && req.user.role !== "admin") {
       return res.status(403).json({
-        message: "Not authorized to update this booking",
+        message: "Not authorized",
       });
     }
-    booking.status = status;
+
+    // ✅ update fields only if provided
+    if (status) {
+      const validStatuses = ["pending", "confirmed", "completed", "cancelled"];
+
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({
+          message: "Invalid status value",
+        });
+      }
+
+      booking.status = status;
+    }
+
+    if (date) booking.date = date;
+    if (time) booking.time = time;
+    if (note !== undefined) booking.note = note;
 
     await booking.save();
 
     return res.status(200).json({
-      message: "Booking status updated",
+      message: "Booking updated",
       data: booking,
     });
   } catch (e) {
+    console.error("UPDATE ERROR:", e); // 👈 ADD THIS
     return res.status(500).json({
-      message: "Server error",
+      message: e.message, // 👈 send actual error
     });
   }
 };
@@ -179,9 +235,14 @@ export const deleteBooking = async (req, res) => {
         message: "Booking not found",
       });
     }
-    if (booking.user.toString() !== userId) {
+    // if (booking.user.toString() !== userId) {
+    //   return res.status(403).json({
+    //     message: "Not authorized to Delete this booking",
+    //   });
+    // }
+    if (booking.user.toString() !== userId && req.user.role !== "admin") {
       return res.status(403).json({
-        message: "Not authorized to Delete this booking",
+        message: "Not authorized",
       });
     }
     await Booking.findByIdAndDelete(id);

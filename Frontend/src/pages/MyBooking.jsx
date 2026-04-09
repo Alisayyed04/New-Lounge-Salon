@@ -33,6 +33,30 @@ export default function MyBooking() {
         getData();
     }, []);
 
+    const handleDelete = async (id) => {
+        const confirmDelete = window.confirm("Delete this booking?");
+        if (!confirmDelete) return;
+
+        const token = localStorage.getItem("token");
+
+        try {
+            await axios.delete(
+                `http://localhost:8080/api/bookings/${id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            // 🔥 update UI instantly
+            setData((prev) => prev.filter((b) => b._id !== id));
+
+        } catch (err) {
+            console.log(err.message || err.response);
+        }
+    };
+
     return (
         <>
             <h2>My Bookings</h2>
@@ -45,6 +69,7 @@ export default function MyBooking() {
                         <BookingCard
                             key={booking._id}
                             booking={booking}
+                            onDelete={handleDelete}
                         />
                     ))
                 )}

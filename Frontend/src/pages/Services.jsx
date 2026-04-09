@@ -14,6 +14,7 @@ export default function Home() {
                 const req = await axios.get(
                     "http://localhost:8080/api/services"
                 );
+                console.log(req.data.data);
                 setData(req.data.data);
             } catch (e) {
                 console.log("Error:", e.message || e.response);

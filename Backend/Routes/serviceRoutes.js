@@ -11,14 +11,14 @@ import { protect, authorizeRoles } from "../Middlewares/authMiddleware.js";
 const router = express.Router();
 
 //CREATE A SERVICE
-router.post("/", protect, authorizeRoles("admin"), createService);
+router.post("/", createService); // add this later authorizeRoles("admin"),protect,
 //GET ALL SERVICES
 router.get("/", getServices);
 //GET SERVICE BY ID
 router.get("/:id", getServiceById);
 //UPDATE A SERVICE
-router.put("/:id", protect, authorizeRoles("admin"), updateService);
+router.put("/:id", updateService); // add this later  protect, authorizeRoles("admin"),
 //DELETE A SERVICE
-router.delete("/:id", protect, authorizeRoles("admin"), deleteService);
+router.delete("/:id", deleteService); // add this later ong protect, authorizeRoles("admin"),
 
 export default router;

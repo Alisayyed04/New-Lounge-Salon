@@ -1,5 +1,6 @@
 import Service from "../Models/Services.js";
 import mongoose from "mongoose";
+
 export const createService = async (req, res) => {
   try {
     const { name, description, price, duration, category, image, isActive } =
@@ -9,7 +10,7 @@ export const createService = async (req, res) => {
         message: "Enter the essential fields",
       });
     }
-    const exists = await Service.findOne({ name: name.trim().tolowerCase() });
+    const exists = await Service.findOne({ name: name.trim().toLowerCase() });
     if (exists) {
       return res.status(400).json({ message: "Service already exists" });
     }
@@ -105,6 +106,7 @@ export const updateService = async (req, res) => {
   }
 };
 
+//HARD DELETING SERVICES
 export const deleteService = async (req, res) => {
   try {
     let { id } = req.params;

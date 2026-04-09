@@ -16,19 +16,25 @@ router.post("/", protect, authorizeRoles("customer"), createBooking); //authoriz
 router.get("/my", protect, authorizeRoles("customer"), getMyBookings);
 
 // general routes after
-router.get("/", protect, authorizeRoles("admin"), getBookings);
+router.get("/", protect, authorizeRoles("admin", "customer"), getBookings);
 router.get(
   "/:id",
   protect,
   authorizeRoles("customer", "admin"),
   getBookingById,
 );
+// protect, authorizeRoles("admin"),
+router.put(
+  "/:id",
+  protect,
+  authorizeRoles("admin", "customer"),
+  updateBookingStatus,
+);
 
-router.put("/:id", protect, authorizeRoles("admin"), updateBookingStatus);
 router.delete(
   "/:id",
   protect,
-  authorizeRoles("customer", "admin"),
+  authorizeRoles("admin", "customer"),
   deleteBooking,
 );
 
