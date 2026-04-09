@@ -8,7 +8,7 @@ export default function navbar() {
                     <li><Link to="/">Home</Link></li>
                     <li><Link to="/services">Services</Link></li>
                     <li><Link to="/bookings">Bookings</Link></li>
-                    <li><Link to="/dashboard">Dashboard</Link></li>
+                    <li><Link to="/dashboard/mydashboard">Dashboard</Link></li>
                     <li><Link to="/register">Register</Link></li>
                     <li><Link to="/login">Login</Link></li>
                 </ul>

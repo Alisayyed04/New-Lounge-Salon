@@ -1,7 +1,9 @@
 import { useState } from "react"
 import axios from "axios"
+import { useNavigate } from "react-router-dom"
 
 export default function LoginUser() {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -56,7 +58,7 @@ export default function LoginUser() {
                     placeholder="Enter Password"
                     value={formData.password}
                     minLength="6" /><br></br>
-                <button>Submit</button>
+                <button onClick={() => navigate("/",)}>Submit</button>
             </form>
         </>
     )

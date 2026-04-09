@@ -55,7 +55,8 @@ export default function Bookings() {
                 }
             );
             console.log("success", res.data)
-
+            const bookingId = res.data.data._id;
+            navigate(`/dashboard/${bookingId}`);
             setFormData({
                 date: "",
                 time: "09:00",
@@ -63,6 +64,7 @@ export default function Bookings() {
                 totalPrice: serviceData.price,
             })
             console.log("TOKEN", token)
+
         } catch (e) {
             console.log(e.message || e.response)
 
@@ -109,10 +111,11 @@ export default function Bookings() {
                 <textarea
                     id="notes"
                     name="notes"
+                    value={formData.notes}
                     // placeholder={Date().now}
                     // value={formData.date}
                     onChange={handleFormData} />
-                <button onClick={() => navigate(`/dashboard`)}>Book Now</button>
+                <button type="submit">Book Now</button>
             </form>
         </>
     )

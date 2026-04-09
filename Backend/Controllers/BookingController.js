@@ -100,8 +100,8 @@ export const getMyBookings = async (req, res) => {
   try {
     // const userId = req.params.id;
     const userId = req.user.id;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user ID" });
     }
     const bookings = await Booking.find({ user: userId }).populate([
       "service",

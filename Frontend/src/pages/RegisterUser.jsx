@@ -1,7 +1,8 @@
 import { useState } from "react"
 import axios from "axios"
-
+import { useNavigate } from "react-router-dom"
 export default function RegisterUser() {
+    const navigate = useNavigate()
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -96,7 +97,7 @@ export default function RegisterUser() {
                     accept="image/*"
                     value={formData.profilePic}
                     onChange={handleFormData} /> */}
-                <button>Submit</button>
+                <button onClick={() => navigate("/")}>Submit</button>
             </form>
 
         </>
