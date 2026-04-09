@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import DashBoardCard from "../components/DashBoardCard";
+import BookingCard from "../components/BookingCard";
 
-export default function MyDashboard() {
+export default function MyBooking() {
 
     // ✅ must be array
     let [data, setData] = useState([]);
@@ -23,7 +23,7 @@ export default function MyDashboard() {
 
                 console.log("success", req.data);
 
-                setData(req.data.data); // ✅ already array
+                setData(req.data.data);
 
             } catch (e) {
                 console.log(e.message || e.response);
@@ -31,7 +31,7 @@ export default function MyDashboard() {
         };
 
         getData();
-    }, []); // ✅ no ID dependency
+    }, []);
 
     return (
         <>
@@ -42,7 +42,7 @@ export default function MyDashboard() {
                     <p>No bookings found</p>
                 ) : (
                     data.map((booking) => (
-                        <DashBoardCard
+                        <BookingCard
                             key={booking._id}
                             booking={booking}
                         />

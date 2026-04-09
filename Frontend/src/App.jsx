@@ -3,10 +3,10 @@ import RegisterUser from "./pages/RegisterUser";
 import Services from "./pages/Services.jsx";
 import Navbar from "./components/navbar.jsx";
 import Home from "./pages/Home.jsx"
+import BookingForm from "./pages/BookingForm.jsx"
 import Booking from "./pages/Booking.jsx"
-import Dashboard from "./pages/Dashboard.jsx";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
-import MyDashboard from "./pages/MyDashboard.jsx";
+import MyBooking from "./pages/MyBooking.jsx";
 
 function App() {
   return (
@@ -18,9 +18,9 @@ function App() {
         <Route path="/login" element={<LoginUser />} />
         <Route path="/register" element={<RegisterUser />} />
         <Route path="/services" element={<Services />} />
-        <Route path="/bookings/:id" element={<Booking />} />
-        <Route path="/dashboard/:id" element={<Dashboard />} />
-        <Route path="/dashboard/mydashboard" element={<MyDashboard />} />
+        <Route path="/bookings/:id" element={<BookingForm />} />
+        <Route path="/booking/:id" element={<Booking />} />
+        <Route path="/booking/mybooking" element={<MyBooking />} />
       </Routes>
     </BrowserRouter>
   );

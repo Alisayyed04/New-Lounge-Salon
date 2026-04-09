@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom"
 
-export default function DashBoardCard({ booking }) {
+export default function BookingCard({ booking }) {
     const navigate = useNavigate();
     let { user } = booking
     return (
@@ -11,7 +11,7 @@ export default function DashBoardCard({ booking }) {
                 <p>Date: {booking.date}</p>
                 <p>Time: {booking.time}</p>
                 <p>Status: {booking.status}</p>
-                <button onClick={() => navigate(`/Dashboard/MyDashboard`)}>My Bookings</button>
+                <button onClick={() => navigate(`/Booking/MyBooking`)}>My Bookings</button>
             </div>
         </>
     )
