@@ -3,45 +3,87 @@ import bcrypt from "bcrypt";
 import "dotenv/config";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-
+import cloudinary from "../Config/cloudinary.js";
+import streamifier from "streamifier";
 const userExists = async (email) => {
   return User.findOne({ email });
 };
 
-//Registering user
 const registerUser = async (req, res) => {
   try {
-    //deconstructing the req.body to get all the fields
-    const { name, email, password, phone, address, profilePic, bookings } =
-      req.body;
-    //checking if name email and password are present
+    const { name, email, password, phone, address, bookings } = req.body;
+
+    // validations
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields required!" });
     }
-    //send callback to userExists function
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters" });
+    }
+
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(phone)) {
+      return res.status(400).json({ message: "Invalid phone number" });
+    }
+
     if (await userExists(email)) {
       return res.status(409).json({
         message: "User already Exists",
       });
     }
-    //using bcrypt to create a stonger password
+
+    // ✅ HASH PASSWORD
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    //creating new user
+
+    // ✅ CLOUDINARY UPLOAD START
+    let imageUrl = "";
+
+    if (req.file) {
+      const streamUpload = () => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "profile_pics" },
+            (error, result) => {
+              if (result) resolve(result);
+              else reject(error);
+            },
+          );
+
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+      };
+
+      const result = await streamUpload();
+      imageUrl = result.secure_url;
+    }
+    // ✅ CLOUDINARY UPLOAD END
+
+    // ✅ CREATE USER
     const user = new User({
       name,
       email,
       password: hashedPassword,
       phone,
       address,
-      profilePic: req.file?.path || null,
+      profilePic: imageUrl,
       bookings,
       role: "customer",
     });
-    //saving new user
+
     await user.save();
-    //sending token so we can authorize who can check what
+
+    // ✅ TOKEN
     const payload = { id: user._id, email: user.email, role: user.role };
+
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
@@ -49,6 +91,7 @@ const registerUser = async (req, res) => {
     return res.status(201).json({
       message: "User registered successfully",
       token,
+      user,
     });
   } catch (e) {
     return res.status(500).json({

@@ -1,9 +1,7 @@
 import { Link } from "react-router-dom";
 
 export default function AdminSidebar({ isOpen, setIsOpen }) {
-    const user = JSON.parse(localStorage.getItem("user"));
 
-    if (user?.role !== "admin") return null;
 
     return (
         <>

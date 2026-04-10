@@ -2,7 +2,7 @@ import { useState } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
 
-export default function LoginUser() {
+export default function LoginUser({ setUser }) {
     const navigate = useNavigate();
     //state to manage the inputs 
     const [formData, setFormData] = useState({
@@ -25,9 +25,10 @@ export default function LoginUser() {
                 formData
             )
             console.log("success", res.data)
-
-            localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));
+            localStorage.setItem("token", res.data.token);
+
+            setUser(res.data.user);
 
             setFormData({
                 email: "",
@@ -66,7 +67,6 @@ export default function LoginUser() {
                     placeholder="Enter Password"
                     value={formData.password}
                     minLength="6" /><br></br>
-                    //going to home page after successful login
                 <button type="submit">Submit</button>
             </form>
         </>

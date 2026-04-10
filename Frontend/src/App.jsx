@@ -20,20 +20,29 @@ import Admin from "./pages/Admin.jsx";
 import Home from "./pages/Home.jsx";
 import CreateAdmin from "./pages/CreateAdmin.jsx";
 import AdminBookings from "./pages/AllBooking.jsx";
+import AboutUs from "./pages/AboutUs.jsx";
 
 function App() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const [isOpen, setIsOpen] = useState(true);
 
+  const [isOpen, setIsOpen] = useState(true);
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user")) || null;
+    } catch {
+      return null;
+    }
+  });
   return (
     <BrowserRouter>
-      <Navbar />
-      <AdminSidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+      <Navbar setUser={setUser} />
+
+      {user?.role === "admin" && (
+        <AdminSidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+      )}
 
       <div
         style={{
-          marginLeft:
-            user?.role === "admin" && isOpen ? "200px" : "0px",
+          marginLeft: user?.role === "admin" && isOpen ? "200px" : "0px",
           transition: "all 0.3s ease",
           padding: "20px"
         }}
@@ -41,10 +50,10 @@ function App() {
         <Routes>
           {/* PUBLIC */}
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<LoginUser />} />
+          <Route path="/login" element={<LoginUser setUser={setUser} />} />
           <Route path="/register" element={<RegisterUser />} />
           <Route path="/services" element={<Services />} />
-
+          <Route path="/about" element={<AboutUs />} />
           {/* BOOKINGS */}
           <Route path="/bookings/:id" element={<BookingForm />} />
           <Route path="/booking/:id" element={<Booking />} />
