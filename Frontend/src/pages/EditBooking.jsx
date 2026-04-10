@@ -3,6 +3,7 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 
 export default function EditBooking() {
+    //comes here from booking card 
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -73,7 +74,9 @@ export default function EditBooking() {
                 }
             );
             alert("Booking updated ✅");
-            navigate("/home");
+            //Goes to home page after updation 
+
+            navigate("/");
         } catch (err) {
             console.log(err);
             alert("Update failed ❌");

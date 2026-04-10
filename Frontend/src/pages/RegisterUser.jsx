@@ -3,6 +3,7 @@ import axios from "axios"
 import { useNavigate } from "react-router-dom"
 export default function RegisterUser() {
     const navigate = useNavigate()
+    //state to save data from user 
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -21,6 +22,7 @@ export default function RegisterUser() {
     const handleForm = async (e) => {
         e.preventDefault()
         try {
+            //sending req to backend 
             const res = await axios.post(
                 "http://localhost:8080/api/users/register",
                 formData

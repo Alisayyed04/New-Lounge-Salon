@@ -2,7 +2,8 @@ import { useNavigate } from "react-router-dom";
 
 export default function BookingCard({ booking, onDelete }) {
     const navigate = useNavigate();
-
+    //shows booking data also buttons to edit it if need be or delete them 
+    //i believe i should take them and give them only to admin 
     return (
         <div>
             <h3>{booking.service?.name}</h3>

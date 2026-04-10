@@ -1,11 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-
+//getting data from the parent in props 
 export default function ServiceCard({ service }) {
 
     const navigate = useNavigate();
 
+    //delete service function for service 
     const handleDelete = async () => {
         const confirmDelete = window.confirm("Are you sure?");
 
@@ -28,6 +29,7 @@ export default function ServiceCard({ service }) {
     return (
         <>
             <div >
+                //printing out the detials of services
                 <img src={service.image || "https://via.placeholder.com/200"} alt={service.name} />
                 <h2>{service.name}</h2>
                 <p>{service.description}</p>

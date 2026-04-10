@@ -4,7 +4,7 @@ import BookingCard from "../components/BookingCard";
 
 export default function MyBooking() {
 
-    // ✅ must be array
+
     let [data, setData] = useState([]);
 
     useEffect(() => {
@@ -49,7 +49,7 @@ export default function MyBooking() {
                 }
             );
 
-            // 🔥 update UI instantly
+
             setData((prev) => prev.filter((b) => b._id !== id));
 
         } catch (err) {

@@ -4,11 +4,12 @@ import { useNavigate } from "react-router-dom"
 
 export default function LoginUser() {
     const navigate = useNavigate();
+    //state to manage the inputs 
     const [formData, setFormData] = useState({
         email: "",
         password: "",
     })
-
+    //setting data based on the input value
     const handleFormData = (e) => {
         setFormData((d) => {
             return { ...d, [e.target.name]: e.target.value }
@@ -18,6 +19,7 @@ export default function LoginUser() {
     const handleForm = async (e) => {
         e.preventDefault()
         try {
+            //sending data to backend 
             const res = await axios.post(
                 "http://localhost:8080/api/users/login",
                 formData
@@ -58,6 +60,7 @@ export default function LoginUser() {
                     placeholder="Enter Password"
                     value={formData.password}
                     minLength="6" /><br></br>
+                    //going to home page after successful login
                 <button onClick={() => navigate("/",)}>Submit</button>
             </form>
         </>

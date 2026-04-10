@@ -54,6 +54,7 @@ export default function EditService() {
             );
 
             alert("Service updated ✅");
+            //goes to home page
             navigate("/");
         } catch (err) {
             console.log("Update error:", err);

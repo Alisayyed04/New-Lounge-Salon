@@ -1,7 +1,10 @@
 import Booking from "../Models/Booking.js";
 import mongoose from "mongoose";
+
+//CREATING NEW BOOKING
 export const createBooking = async (req, res) => {
   try {
+    //GET THE DATA FROM REQ.BODY
     const {
       user = req.user.id,
       service,
@@ -12,12 +15,13 @@ export const createBooking = async (req, res) => {
       totalPrice,
       notes,
     } = req.body;
-
+    //CHECK THE FIELDS ARE FILLED
     if (!user || !service || !date || !time) {
       return res.status(400).json({
         message: "Please fill all required fields",
       });
     }
+    //BOOKING STATUS MANAGER
     const slotExists = await Booking.findOne({
       staff,
       date,
@@ -29,6 +33,7 @@ export const createBooking = async (req, res) => {
         message: "This time slot is already booked",
       });
     }
+    //SAVING NEW BOOKING IN DB
     const booking = new Booking({
       user,
       service,
@@ -51,13 +56,16 @@ export const createBooking = async (req, res) => {
   }
 };
 
+//SHOW ALL BOOKING
 export const getBookings = async (req, res) => {
   try {
+    //STORING DATA FROM DB IN VARIABLE
     const bookings = await Booking.find().populate([
       "user",
       "service",
       "staff",
     ]);
+    //SENDING TO FRONTEND
     return res.status(200).json({
       success: true,
       data: bookings,
@@ -69,12 +77,15 @@ export const getBookings = async (req, res) => {
   }
 };
 
+//SHOW BOOKING BASED ON BOOOKING ID
 export const getBookingById = async (req, res) => {
   try {
+    //GET THE BOOKING ID
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid ID" });
     }
+    //FIND THE BOOKING BASED ON BOOKING ID IN DB
     const booking = await Booking.findById(id).populate([
       "user",
       "service",
@@ -85,6 +96,7 @@ export const getBookingById = async (req, res) => {
         message: "Booking not found",
       });
     }
+    //RETURN BOOKING
     return res.status(200).json({
       success: true,
       data: booking,
@@ -96,13 +108,16 @@ export const getBookingById = async (req, res) => {
   }
 };
 
+//GET THE USER'S BOOKING
 export const getMyBookings = async (req, res) => {
   try {
+    //GET THE USER ID FROM REQ BODY
     // const userId = req.params.id;
     const userId = req.user.id;
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: "Invalid user ID" });
     }
+    //FINDING THE USERS BOOKING IN DB
     const bookings = await Booking.find({ user: userId }).populate([
       "service",
       "staff",
@@ -112,6 +127,7 @@ export const getMyBookings = async (req, res) => {
         message: "You don't have any bookings",
       });
     }
+    //SENDING THE DATA TO FRONTEND
     return res.status(200).json({
       success: true,
       count: bookings.length,
@@ -166,16 +182,20 @@ export const getMyBookings = async (req, res) => {
 //   }
 // };
 
+//UPDATE BOOKING STATUS DATE TIME AND NOTE
 export const updateBookingStatus = async (req, res) => {
   try {
+    //GET THE USER ID AND THE BOOKING ID THEY WANNA UPDATE
     const userId = req.user.id;
+    // DIFFERENCE BETWEEN Request.USER.ID AND REQ.PARAMS IS THAT I CAN GET THE PARAMS
+    // FROM THE ROUTE BUT I HAVE TO GET THE USER ID FROM THE DATA
     const { id } = req.params;
     const { status, date, time, note } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid ID" });
     }
-
+    //FINDING THE BOOKING BASED ON THE BOOKING ID
     const booking = await Booking.findById(id);
 
     if (!booking) {
@@ -184,14 +204,14 @@ export const updateBookingStatus = async (req, res) => {
       });
     }
 
-    // 🔒 only admin OR owner
+    //  only admin OR owner CAN UPDATE BOOKING
     if (booking.user.toString() !== userId && req.user.role !== "admin") {
       return res.status(403).json({
         message: "Not authorized",
       });
     }
 
-    // ✅ update fields only if provided
+    // update fields only if provided
     if (status) {
       const validStatuses = ["pending", "confirmed", "completed", "cancelled"];
 
@@ -206,8 +226,8 @@ export const updateBookingStatus = async (req, res) => {
 
     if (date) booking.date = date;
     if (time) booking.time = time;
-    if (note !== undefined) booking.note = note;
-
+    if (note !== undefined) booking.notes = note;
+    //SAVING IN DB
     await booking.save();
 
     return res.status(200).json({
@@ -222,6 +242,7 @@ export const updateBookingStatus = async (req, res) => {
   }
 };
 
+//DELETING THE BOOKING
 export const deleteBooking = async (req, res) => {
   try {
     const userId = req.user.id;

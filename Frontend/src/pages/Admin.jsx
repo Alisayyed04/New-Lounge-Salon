@@ -5,7 +5,7 @@ export default function Admin() {
     const [data, setData] = useState({});
 
     useEffect(() => {
-
+        //shows all bookings 
         const fetch = async () => {
             const token = localStorage.getItem("token")
             try {
@@ -22,11 +22,13 @@ export default function Admin() {
             } catch (e) {
                 console.log(e.message || e.response)
             }
-
         }
-
         fetch();
     }, [])
+
+    //want this to be my dashboard where i can do anything based on the sidebar 
+    //i can create services edit them delete them 
+    //i can manage the bookings 
     return (
         <>
             {console.log(data)}
