@@ -36,6 +36,7 @@ const registerUser = async (req, res) => {
       address,
       profilePic: req.file?.path || null,
       bookings,
+      role: "customer",
     });
     //saving new user
     await user.save();
@@ -87,11 +88,67 @@ const loginUser = async (req, res) => {
     return res.status(200).json({
       message: "Login successful",
       token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
     return res
       .status(500)
       .json({ message: "There has been a error!", error: error.message });
+  }
+};
+
+export const createAdmin = async (req, res) => {
+  try {
+    const { name, email, password, phone } = req.body;
+
+    // basic validation
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        message: "All fields required!",
+      });
+    }
+
+    // check if user already exists
+    if (await userExists(email)) {
+      return res.status(409).json({
+        message: "User already exists",
+      });
+    }
+
+    // hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // create admin
+    const admin = new User({
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+      role: "admin",
+    });
+
+    await admin.save();
+
+    return res.status(201).json({
+      message: "Admin created successfully",
+      admin: {
+        id: admin._id,
+        name: admin.name,
+        email: admin.email,
+        role: admin.role,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error creating admin",
+      error: error.message,
+    });
   }
 };
 

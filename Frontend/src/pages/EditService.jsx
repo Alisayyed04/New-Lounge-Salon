@@ -42,7 +42,7 @@ export default function EditService() {
             [e.target.name]: e.target.value,
         });
     };
-
+    const token = localStorage.getItem("token");
     // 🔹 Submit update
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -50,7 +50,12 @@ export default function EditService() {
         try {
             await axios.put(
                 `http://localhost:8080/api/services/${id}`,
-                formData
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
             );
 
             alert("Service updated ✅");

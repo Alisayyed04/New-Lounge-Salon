@@ -1,13 +1,13 @@
+
 import { useEffect, useState } from "react"
 import axios from "axios";
 import { useParams } from "react-router-dom"
 import BookingCard from "../components/BookingCard";
 //get navigated to here by serviceCard component
 
-export default function Dashboard() {
+export default function Booking() {
     let { id: ID } = useParams()
-    let [data, setData] = useState()
-
+    let [data, setData] = useState(null)
 
     useEffect(() => {
         const getData = async () => {
@@ -31,12 +31,13 @@ export default function Dashboard() {
         }
         getData();
     }, [ID])
-    //shows booking based on id that is based on user id 
+    //shows booking based on id that is based on user id
     return (
         <>
             <h2>Bookings</h2>
             <div>
-                {data && <BookingCard booking={data} />}
+                {data && <BookingCard booking={data}
+                    showActions={false} />}
 
             </div>
         </>

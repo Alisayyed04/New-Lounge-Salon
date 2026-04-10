@@ -1,53 +1,75 @@
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-//getting data from the parent in props 
-export default function ServiceCard({ service }) {
-
+export default function ServiceCard({ service, isAdmin }) {
     const navigate = useNavigate();
 
-    //delete service function for service 
     const handleDelete = async () => {
-        const confirmDelete = window.confirm("Are you sure?");
-
+        const confirmDelete = window.confirm("Are you sure you want to delete this service?");
         if (!confirmDelete) return;
+
+        const token = localStorage.getItem("token");
 
         try {
             await axios.delete(
-                `http://localhost:8080/api/services/${service._id}`
+                `http://localhost:8080/api/services/${service._id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
             );
 
-            alert("Deleted ✅");
+            alert("Service deleted ✅");
 
-            // quick refresh (simple way)
+            // simple refresh (you can optimize later)
             window.location.reload();
+
         } catch (err) {
-            console.log("Delete error:", err);
-            alert("Failed ❌");
+            console.log("Delete error:", err.message || err.response);
+            alert("Failed to delete ❌");
         }
     };
-    return (
-        <>
-            <div >
-                //printing out the detials of services
-                <img src={service.image || "https://via.placeholder.com/200"} alt={service.name} />
-                <h2>{service.name}</h2>
-                <p>{service.description}</p>
-                <h3>₹{service.price}</h3>
-                <p>{service.category}</p>
-                <p>{service.duration}</p>
-                <button onClick={() => navigate(`/bookings/${service._id}`)}>
-                    Book Now
-                </button>
-                <button>View Gallery</button>
-                <button onClick={() => navigate(`/editservice/${service._id}`)}>
-                    Edit
-                </button>
-                <button onClick={handleDelete}>
-                    Delete
-                </button>
-            </div>
 
-        </>
-    )
+    return (
+        <div >
+            {/* Service Info */}
+            <img
+                src={service.image || "https://via.placeholder.com/200"}
+                alt={service.name}
+                width="200"
+            />
+
+            <h2>{service.name}</h2>
+            <p>{service.description}</p>
+            <h3>₹{service.price}</h3>
+            <p>Category: {service.category}</p>
+            <p>Duration: {service.duration} mins</p>
+
+            {/* USER ACTION */}
+            <button onClick={() => navigate(`/bookings/${service._id}`)}>
+                Book Now
+            </button>
+
+            <button onClick={() => navigate("/")}>
+                View Gallery **Coming Soon**
+            </button>
+
+            {/* ADMIN ONLY */}
+            {isAdmin && (
+                <div>
+                    <button onClick={() => {
+                        console.log("EDIT CLICKED:", service._id);
+                        navigate(`/editservice/${service._id}`);
+                    }}>
+                        Edit
+                    </button>
+
+                    <button onClick={handleDelete} >
+                        Delete
+                    </button>
+                </div>
+            )}
+        </div>
+    );
 }

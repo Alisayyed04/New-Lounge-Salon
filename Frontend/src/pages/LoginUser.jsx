@@ -26,12 +26,18 @@ export default function LoginUser() {
             )
             console.log("success", res.data)
 
-            localStorage.setItem("token", res.data.token)
+            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("user", JSON.stringify(res.data.user));
 
             setFormData({
                 email: "",
                 password: "",
             })
+            if (res.data.user?.role === "admin") {
+                navigate("/admin/dashboard");
+            } else {
+                navigate("/");
+            }
         } catch (e) {
             console.log("Error", e.response?.data || e.message)
         }
@@ -61,7 +67,7 @@ export default function LoginUser() {
                     value={formData.password}
                     minLength="6" /><br></br>
                     //going to home page after successful login
-                <button onClick={() => navigate("/",)}>Submit</button>
+                <button type="submit">Submit</button>
             </form>
         </>
     )
