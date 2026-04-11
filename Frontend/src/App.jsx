@@ -5,7 +5,7 @@ import Services from "./pages/Services.jsx";
 import CreateService from "./pages/CreateService.jsx";
 import EditService from "./pages/EditService.jsx"; // ✅ ADD THIS
 
-import BookingForm from "./pages/BookingForm.jsx";
+import CreateBooking from "./pages/CreateBooking.jsx";
 import Booking from "./pages/Booking.jsx";
 import MyBooking from "./pages/MyBooking.jsx";
 import EditBooking from "./pages/EditBooking.jsx";
@@ -55,7 +55,7 @@ function App() {
           <Route path="/services" element={<Services />} />
           <Route path="/about" element={<AboutUs />} />
           {/* BOOKINGS */}
-          <Route path="/bookings/:id" element={<BookingForm />} />
+          <Route path="/bookings/:id" element={<CreateBooking />} />
           <Route path="/booking/:id" element={<Booking />} />
           <Route path="/booking/mybooking" element={<MyBooking />} />
           <Route path="/editbooking/:id" element={<EditBooking />} />

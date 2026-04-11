@@ -1,21 +1,40 @@
 import { useNavigate } from "react-router-dom";
 
-export default function BookingCard({
-    booking,
-    onDelete,
-    showActions = true   // 👈 default true
-}) {
+export default function BookingCard({ booking, onDelete }) {
     const navigate = useNavigate();
 
-    return (
-        <div>
-            <h3>{booking.service?.name}</h3>
-            <p>User: {booking.user?.name}</p>
-            <p>Date: {booking.date?.split("T")[0]}</p>
-            <p>Time: {booking.time}</p>
-            <p>Status: {booking.status}</p>
+    const user = JSON.parse(localStorage.getItem("user"));
+    const isAdmin = user?.role === "admin";
 
-            {showActions && (
+    if (!booking) return null;
+
+    return (
+        <div style={{ border: "1px solid #ccc", padding: "15px", marginBottom: "10px" }}>
+
+            {/* ✅ FIXED IMAGE */}
+            {booking?.service?.image ? (
+                <img
+                    src={booking.service.image}
+                    alt={booking.service.name}
+                    width="120"
+                />
+            ) : (
+                <p>No Image</p>
+            )}
+
+            <h3>{booking?.service?.name}</h3>
+            <p>Category: {booking?.service?.category}</p>
+
+            <p>Price: ₹{booking?.totalPrice}</p>
+            <p>Date: {booking?.date?.split("T")[0]}</p>
+            <p>Time: {booking?.time}</p>
+            <p>Status: {booking?.status}</p>
+
+            {isAdmin && <p>User: {booking?.user?.name}</p>}
+
+            {booking?.notes && <p>Notes: {booking.notes}</p>}
+
+            {isAdmin && (
                 <>
                     <button onClick={() => navigate(`/editbooking/${booking._id}`)}>
                         Edit
@@ -29,9 +48,6 @@ export default function BookingCard({
         </div>
     );
 }
-
-
-
 
 
 // import { useNavigate } from "react-router-dom";

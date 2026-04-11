@@ -23,10 +23,11 @@ export default function MyBooking() {
 
                 console.log("success", req.data);
 
-                setData(req.data.data);
+                setData(req.data.data || []);
 
             } catch (e) {
-                console.log(e.message || e.response);
+                setData([]);
+                console.log("Error", e.message || e.reponse);// ✅ prevents crash
             }
         };
 

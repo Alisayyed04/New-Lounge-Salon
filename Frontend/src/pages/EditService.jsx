@@ -16,36 +16,75 @@ export default function EditService() {
     });
 
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
-    // 🔹 Fetch existing service
-    useEffect(() => {
-        const fetchService = async () => {
-            try {
-                const res = await axios.get(
-                    `http://localhost:8080/api/services/${id}`
-                );
+    // 🔒 Logout helper (declare FIRST)
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        navigate("/login");
+    };
 
-                setFormData(res.data.data); // adjust if your API differs
-                setLoading(false);
-            } catch (err) {
-                console.log("Error fetching service:", err);
+    // 🔹 Fetch service (declare BEFORE useEffect)
+    const fetchService = async (token) => {
+        try {
+            const res = await axios.get(
+                `http://localhost:8080/api/services/${id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            setFormData(res.data.data);
+            setLoading(false);
+        } catch (err) {
+            console.log("Fetch error:", err.response?.data || err.message);
+
+            if (err.response?.status === 401 || err.response?.status === 403) {
+                handleLogout();
+                return;
             }
-        };
 
-        fetchService();
+            setError("Failed to load service ❌");
+            setLoading(false);
+        }
+    };
+
+    // 🔒 AUTH CHECK + FETCH
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem("user"));
+        const token = localStorage.getItem("token");
+
+        if (!token || user?.role !== "admin") {
+            alert("Unauthorized ❌");
+            navigate("/");
+            return;
+        }
+
+        fetchService(token);
+
     }, [id]);
 
-    // 🔹 Handle input change
+    // 🔹 Handle input
     const handleChange = (e) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value,
         });
     };
-    const token = localStorage.getItem("token");
+
     // 🔹 Submit update
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            handleLogout();
+            return;
+        }
 
         try {
             await axios.put(
@@ -59,11 +98,17 @@ export default function EditService() {
             );
 
             alert("Service updated ✅");
-            //goes to home page
             navigate("/");
+
         } catch (err) {
-            console.log("Update error:", err);
-            alert("Failed to update ❌");
+            console.log("Update error:", err.response?.data || err.message);
+
+            if (err.response?.status === 401 || err.response?.status === 403) {
+                handleLogout();
+                return;
+            }
+
+            setError("Failed to update ❌");
         }
     };
 
@@ -71,20 +116,20 @@ export default function EditService() {
 
     return (
         <div>
-            <h2>Edit Service</h2>
+            <h2>Edit Service (Admin)</h2>
+
+            {error && <p style={{ color: "red" }}>{error}</p>}
 
             <form onSubmit={handleSubmit}>
                 <input
                     name="name"
                     value={formData.name}
-                    placeholder="Name"
                     onChange={handleChange}
                 />
 
-                <input
+                <textarea
                     name="description"
                     value={formData.description}
-                    placeholder="Description"
                     onChange={handleChange}
                 />
 
@@ -92,7 +137,6 @@ export default function EditService() {
                     name="price"
                     type="number"
                     value={formData.price}
-                    placeholder="Price"
                     onChange={handleChange}
                 />
 
@@ -100,21 +144,18 @@ export default function EditService() {
                     name="duration"
                     type="number"
                     value={formData.duration}
-                    placeholder="Duration"
                     onChange={handleChange}
                 />
 
                 <input
                     name="category"
                     value={formData.category}
-                    placeholder="Category"
                     onChange={handleChange}
                 />
 
                 <input
                     name="image"
                     value={formData.image}
-                    placeholder="Image URL"
                     onChange={handleChange}
                 />
 

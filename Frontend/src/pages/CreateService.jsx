@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -11,50 +11,158 @@ export default function CreateService() {
         price: "",
         duration: "",
         category: "",
-        image: "",
+        image: null,
     });
 
+    const [error, setError] = useState("");
+
+    // ✅ Protect route (ADMIN ONLY)
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem("user"));
+        const token = localStorage.getItem("token");
+
+        if (!token || user?.role !== "admin") {
+            alert("Unauthorized ❌");
+            navigate("/");
+        }
+    }, []);
+
+    // ✅ Handle input change
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
-    };
+        const { name, value, files } = e.target;
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        try {
-            await axios.post(
-                "http://localhost:8080/api/services/",
-                formData
-            );
-
-            alert("Service created ✅");
-
-            navigate("/"); // go back home
-        } catch (err) {
-            console.log(err);
-            alert("Error creating service ❌");
+        if (name === "image") {
+            setFormData({ ...formData, image: files[0] });
+        } else {
+            setFormData({ ...formData, [name]: value });
         }
     };
 
+    // ✅ STRICT VALIDATION
+    const validateForm = () => {
+        if (!formData.name.trim()) return "Name is required";
+        if (formData.name.length < 3) return "Name must be at least 3 characters";
+
+        if (!formData.description.trim()) return "Description is required";
+        if (formData.description.length < 10) return "Description too short";
+
+        if (!formData.price || formData.price <= 0)
+            return "Price must be greater than 0";
+
+        if (!formData.duration || formData.duration < 5)
+            return "Duration must be at least 5 mins";
+
+        const validCategories = ["haircut", "coloring", "nails", "waxing", "makeup"];
+        if (!validCategories.includes(formData.category))
+            return "Invalid category";
+
+        if (!formData.image) return "Image is required";
+
+        return null;
+    };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const validationError = validateForm();
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem("token");
+
+            const data = new FormData();
+
+            data.append("name", formData.name);
+            data.append("description", formData.description);
+            data.append("price", formData.price);
+            data.append("duration", formData.duration);
+            data.append("category", formData.category);
+
+            // 🔥 VERY IMPORTANT (must match multer field name)
+            if (formData.image) {
+                data.append("image", formData.image);
+            }
+
+            await axios.post(
+                "http://localhost:8080/api/services/",
+                data,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            alert("Service created ✅");
+            navigate("/");
+
+        } catch (err) {
+            console.log(err.response?.data || err.message);
+            setError("Error creating service ❌");
+        }
+    };
     return (
         <div>
-            <h2>Create Service</h2>
+            <h2>Create Service (Admin)</h2>
+
+            {error && <p style={{ color: "red" }}>{error}</p>}
 
             <form onSubmit={handleSubmit}>
-                <input name="name" placeholder="Name" onChange={handleChange} />
-                <input name="description" placeholder="Description" onChange={handleChange} />
-                <input name="price" placeholder="Price" type="number" onChange={handleChange} />
-                <input name="duration" placeholder="Duration" type="number" onChange={handleChange} />
-                <input name="category" placeholder="Category" onChange={handleChange} />
-                <input name="image" placeholder="Image URL" onChange={handleChange} />
+                <input
+                    name="name"
+                    placeholder="Service Name"
+                    onChange={handleChange}
+                    required
+                />
+
+                <textarea
+                    name="description"
+                    placeholder="Description"
+                    onChange={handleChange}
+                    required
+                />
+
+                <input
+                    name="price"
+                    placeholder="Price"
+                    type="number"
+                    min="1"
+                    onChange={handleChange}
+                    required
+                />
+
+                <input
+                    name="duration"
+                    placeholder="Duration (mins)"
+                    type="number"
+                    min="5"
+                    onChange={handleChange}
+                    required
+                />
+
+                <select name="category" onChange={handleChange} required>
+                    <option value="">Select Category</option>
+                    <option value="haircut">Haircut</option>
+                    <option value="coloring">Coloring</option>
+                    <option value="nails">Nails</option>
+                    <option value="waxing">Waxing</option>
+                    <option value="makeup">Makeup</option>
+                </select>
+
+                {/* 🔥 IMAGE INPUT */}
+                <input
+                    type="file"
+                    name="image"
+                    accept="image/*"
+                    onChange={handleChange}
+                    required
+                />
 
                 <button type="submit">Create Service</button>
-
             </form>
-
         </div>
     );
 }

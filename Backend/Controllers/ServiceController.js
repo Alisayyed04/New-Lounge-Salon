@@ -1,45 +1,58 @@
 import Service from "../Models/Services.js";
 import mongoose from "mongoose";
+import { uploadToCloudinary } from "../Middlewares/cloudinaryUpload.js";
 
-//CREATE SERVICE CONTROLLER
 export const createService = async (req, res) => {
-  //SAVING EVERYTHING FROM REQBODY
   try {
-    const { name, description, price, duration, category, image, isActive } =
-      req.body;
+    const { name, description, price, duration, category, isActive } = req.body;
+
     if (!name || !description || !price) {
       return res.status(400).json({
         message: "Enter the essential fields",
       });
     }
-    //CHECKING IF THAT SERVICE EXISTS
-    const exists = await Service.findOne({ name: name.trim().toLowerCase() });
+
+    const exists = await Service.findOne({
+      name: name.trim().toLowerCase(),
+    });
+
     if (exists) {
-      return res.status(400).json({ message: "Service already exists" });
+      return res.status(400).json({
+        message: "Service already exists",
+      });
     }
-    //CREATING NEW SERVICE
+
+    // 🔥 HANDLE IMAGE
+    let imageUrl;
+
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer);
+      imageUrl = result.secure_url;
+    }
+
     const service = new Service({
       name,
       description,
       price,
       duration,
       category,
-      image: req.file?.path || null,
+      image: imageUrl, // ✅ if undefined → default kicks in
       isActive,
     });
-    //SAVING THAT SERVICE WE CREATED IN DB NEWLOUNGE
+
     await service.save();
+
     return res.status(201).json({
       message: "New service Created!",
+      service,
     });
   } catch (e) {
     return res.status(500).json({
       message: "something went wrong!",
-      e: e.message,
+      error: e.message,
     });
   }
 };
-
 //SHOW ALL SERVICE ROUTE
 export const getServices = async (req, res) => {
   //GET THE REQ AND POPULATE BASED ON CATEGORY AS IN SHOW ALL THE SERVICES BASED ON CATEGORY

@@ -1,22 +1,22 @@
+import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom";
 
-export default function EditBooking() {
-    const { id } = useParams();
+export default function CreateBooking() {
     const navigate = useNavigate();
+    const { id: ID } = useParams();
 
+    const [serviceData, setServiceData] = useState({});
     const [bookedSlots, setBookedSlots] = useState([]);
-    const [loading, setLoading] = useState(true);
 
     const [formData, setFormData] = useState({
         date: "",
         time: "",
-        status: "pending",
         notes: "",
+        totalPrice: 0,
     });
 
-    // ✅ GENERATE SLOTS
+    // ✅ GENERATE TIME SLOTS
     const generateTimeSlots = (start = 9, end = 20, interval = 60) => {
         const slots = [];
         for (let hour = start; hour < end; hour++) {
@@ -31,46 +31,30 @@ export default function EditBooking() {
 
     const allSlots = generateTimeSlots();
 
-    // ✅ FETCH BOOKING
+    // ✅ FETCH SERVICE
     useEffect(() => {
-        const fetchBooking = async () => {
-            const token = localStorage.getItem("token");
-
-            if (!token) {
-                navigate("/login");
-                return;
-            }
-
+        const getService = async () => {
             try {
                 const res = await axios.get(
-                    `http://localhost:8080/api/bookings/${id}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
+                    "http://localhost:8080/api/services/" + ID
                 );
 
-                const booking = res.data.data;
+                const service = res.data.data;
+                setServiceData(service);
 
-                setFormData({
-                    date: booking.date.split("T")[0],
-                    time: booking.time,
-                    status: booking.status || "pending",
-                    notes: booking.notes || "",
-                });
-
-                setLoading(false);
-            } catch (err) {
-                console.log(err);
-                navigate("/"); // fallback
+                setFormData((prev) => ({
+                    ...prev,
+                    totalPrice: service.price,
+                }));
+            } catch (e) {
+                console.log(e);
             }
         };
 
-        fetchBooking();
-    }, [id, navigate]);
+        getService();
+    }, [ID]);
 
-    // ✅ FETCH BOOKED SLOTS WHEN DATE CHANGES
+    // ✅ FETCH BOOKED SLOTS
     useEffect(() => {
         const fetchSlots = async () => {
             if (!formData.date) return;
@@ -83,17 +67,13 @@ export default function EditBooking() {
                     }
                 );
 
-                // ❗ Remove current slot so user can keep same time
-                const filtered = res.data.filter(
-                    (slot) => slot !== formData.time
-                );
+                const slots = Array.isArray(res.data) ? res.data : [];
+                setBookedSlots(slots);
 
-                setBookedSlots(filtered);
-
-                // AUTO PICK AVAILABLE SLOT (if current is invalid)
-                if (filtered.includes(formData.time)) {
+                // ✅ ONLY auto-set if user hasn't selected anything
+                if (!formData.time) {
                     const available = allSlots.find(
-                        (s) => !filtered.includes(s)
+                        (s) => !slots.includes(s)
                     );
 
                     if (available) {
@@ -111,47 +91,42 @@ export default function EditBooking() {
         fetchSlots();
     }, [formData.date]);
 
-    // ✅ PAST TIME CHECK
+    // ✅ FIXED PAST TIME CHECK
     const isPastTime = (slot) => {
         if (!formData.date) return false;
 
         const now = new Date();
         const selectedDate = new Date(formData.date);
 
-        if (selectedDate.toDateString() !== now.toDateString()) return false;
+        // only check if same day
+        if (selectedDate.toDateString() !== now.toDateString()) {
+            return false;
+        }
 
-        const currentTime = now.toTimeString().slice(0, 5);
-        return slot <= currentTime;
+        const [h, m] = slot.split(":");
+        const slotDate = new Date();
+        slotDate.setHours(h, m, 0);
+
+        return slotDate < now;
     };
 
-    // ✅ HANDLE CHANGE
-    const handleChange = (e) => {
-        setFormData((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-        }));
-    };
-
-    // ✅ SUBMIT
-    const handleSubmit = async (e) => {
+    // ✅ HANDLE SUBMIT
+    const handleForm = async (e) => {
         e.preventDefault();
 
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-            alert("Login required");
-            navigate("/login");
+        if (!formData.date || !formData.time) {
+            alert("Select date and time");
             return;
         }
 
         try {
-            await axios.put(
-                `http://localhost:8080/api/bookings/${id}`,
+            const token = localStorage.getItem("token");
+
+            const res = await axios.post(
+                "http://localhost:8080/api/bookings/",
                 {
-                    date: formData.date,
-                    time: formData.time,
-                    status: formData.status,
-                    notes: formData.notes,
+                    ...formData,
+                    service: ID,
                 },
                 {
                     headers: {
@@ -160,27 +135,37 @@ export default function EditBooking() {
                 }
             );
 
-            alert("Booking updated ✅");
-            navigate("/");
-        } catch (err) {
-            console.log(err);
-            alert("Update failed ❌");
+            navigate(`/booking/${res.data.data._id}`);
+        } catch (e) {
+            console.log(e.response?.data || e.message);
         }
     };
 
-    if (loading) return <h2>Loading...</h2>;
-
     return (
-        <div>
-            <h2>Edit Booking</h2>
+        <>
+            <h1>Service Details</h1>
 
-            <form onSubmit={handleSubmit}>
+            {serviceData?.img && (
+                <img src={serviceData.img} alt="" width="150" />
+            )}
+
+            <h2>{serviceData.name}</h2>
+            <p>{serviceData.description}</p>
+            <h3>₹{serviceData.price}</h3>
+
+            <form onSubmit={handleForm}>
                 <label>Date</label>
                 <input
                     type="date"
                     name="date"
                     value={formData.date}
-                    onChange={handleChange}
+                    onChange={(e) =>
+                        setFormData((prev) => ({
+                            ...prev,
+                            date: e.target.value,
+                            time: "", // reset time when date changes
+                        }))
+                    }
                 />
 
                 <br />
@@ -213,10 +198,10 @@ export default function EditBooking() {
                                         formData.time === slot
                                             ? "white"
                                             : "black",
-                                    opacity: disabled ? 0.5 : 1,
                                     cursor: disabled
                                         ? "not-allowed"
                                         : "pointer",
+                                    opacity: disabled ? 0.5 : 1,
                                 }}
                             >
                                 {slot}
@@ -227,31 +212,22 @@ export default function EditBooking() {
 
                 <br />
 
-                <label>Notes</label>
                 <textarea
                     name="notes"
+                    placeholder="Notes"
                     value={formData.notes}
-                    onChange={handleChange}
+                    onChange={(e) =>
+                        setFormData((prev) => ({
+                            ...prev,
+                            notes: e.target.value,
+                        }))
+                    }
                 />
 
                 <br />
 
-                <label>Status</label>
-                <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                >
-                    <option value="pending">Pending</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
-
-                <br />
-
-                <button type="submit">Update Booking</button>
+                <button type="submit">Book Now</button>
             </form>
-        </div>
+        </>
     );
 }

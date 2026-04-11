@@ -19,7 +19,7 @@ const serviceSchema = new mongoose.Schema(
     },
 
     duration: {
-      type: Number, // in minutes
+      type: Number,
       required: true,
     },
 
@@ -29,12 +29,13 @@ const serviceSchema = new mongoose.Schema(
     },
 
     image: {
-      type: String, // URL (Cloudinary later)
+      type: String,
+      default: "https://via.placeholder.com/300?text=Service+Image",
     },
 
     isActive: {
       type: Boolean,
-      default: true, // hide service without deleting
+      default: true,
     },
   },
   { timestamps: true },

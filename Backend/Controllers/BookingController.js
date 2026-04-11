@@ -4,55 +4,90 @@ import mongoose from "mongoose";
 //CREATING NEW BOOKING
 export const createBooking = async (req, res) => {
   try {
-    //GET THE DATA FROM REQ.BODY
     const {
       user = req.user.id,
       service,
-      staff,
       date,
       time,
-      status,
       totalPrice,
       notes,
     } = req.body;
-    //CHECK THE FIELDS ARE FILLED
+
     if (!user || !service || !date || !time) {
       return res.status(400).json({
         message: "Please fill all required fields",
       });
     }
-    //BOOKING STATUS MANAGER
+
+    // ✅ FIXED SLOT CHECK (NO STAFF)
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
     const slotExists = await Booking.findOne({
-      staff,
-      date,
+      date: { $gte: start, $lte: end },
       time,
       status: { $ne: "cancelled" },
     });
+
     if (slotExists) {
       return res.status(400).json({
         message: "This time slot is already booked",
       });
     }
-    //SAVING NEW BOOKING IN DB
+
     const booking = new Booking({
       user,
       service,
-      staff,
       date,
       time,
       status: "pending",
       totalPrice,
       notes,
     });
+
     await booking.save();
+
     return res.status(200).json({
       message: "New booking created successfully",
       data: booking,
     });
   } catch (e) {
+    console.error("CREATE BOOKING ERROR:", e); // 👈 DEBUG
     return res.status(500).json({
-      message: "Server error",
+      message: e.message,
     });
+  }
+};
+
+// GET BOOKED SLOTS FOR A DATE + STAFF
+export const getBookedSlots = async (req, res) => {
+  try {
+    const { date } = req.query;
+
+    if (!date) {
+      return res.status(400).json({ message: "Date is required" });
+    }
+
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    const bookings = await Booking.find({
+      date: { $gte: start, $lte: end },
+      status: { $ne: "cancelled" },
+    }).select("time");
+
+    const bookedTimes = bookings.map((b) => b.time);
+
+    res.json(bookedTimes);
+  } catch (err) {
+    console.log("SLOTS ERROR:", err);
+    res.status(500).json({ message: "Error fetching slots" });
   }
 };
 
@@ -60,11 +95,19 @@ export const createBooking = async (req, res) => {
 export const getBookings = async (req, res) => {
   try {
     //STORING DATA FROM DB IN VARIABLE
-    const bookings = await Booking.find().populate([
-      "user",
-      "service",
-      "staff",
-    ]);
+    const bookings = await Booking.find()
+      .populate({
+        path: "user",
+        select: "name email",
+      })
+      .populate({
+        path: "service",
+        select: "name price image category", // ✅ IMPORTANT
+      })
+      .populate({
+        path: "staff",
+        select: "name",
+      });
     //SENDING TO FRONTEND
     return res.status(200).json({
       success: true,
@@ -86,11 +129,19 @@ export const getBookingById = async (req, res) => {
       return res.status(400).json({ message: "Invalid ID" });
     }
     //FIND THE BOOKING BASED ON BOOKING ID IN DB
-    const booking = await Booking.findById(id).populate([
-      "user",
-      "service",
-      "staff",
-    ]);
+    const booking = await Booking.findById(id)
+      .populate({
+        path: "user",
+        select: "name email",
+      })
+      .populate({
+        path: "service",
+        select: "name price image category", // ✅ IMPORTANT
+      })
+      .populate({
+        path: "staff",
+        select: "name",
+      });
     if (!booking) {
       return res.status(404).json({
         message: "Booking not found",
@@ -107,38 +158,64 @@ export const getBookingById = async (req, res) => {
     });
   }
 };
-
-//GET THE USER'S BOOKING
 export const getMyBookings = async (req, res) => {
   try {
-    //GET THE USER ID FROM REQ BODY
-    // const userId = req.params.id;
     const userId = req.user.id;
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({ message: "Invalid user ID" });
-    }
-    //FINDING THE USERS BOOKING IN DB
-    const bookings = await Booking.find({ user: userId }).populate([
-      "service",
-      "staff",
-    ]);
-    if (bookings.length === 0) {
-      return res.status(404).json({
-        message: "You don't have any bookings",
+
+    const bookings = await Booking.find({ user: userId })
+      .populate({
+        path: "service",
+        select: "name price image category", // ✅ THIS FIXES IMAGE
+      })
+      .populate({
+        path: "staff",
+        select: "name",
       });
-    }
-    //SENDING THE DATA TO FRONTEND
+
+    // ✅ ALWAYS RETURN 200
     return res.status(200).json({
       success: true,
       count: bookings.length,
-      data: bookings,
+      data: bookings, // can be []
     });
   } catch (e) {
+    console.log("GET MY BOOKINGS ERROR:", e);
     return res.status(500).json({
       message: "Server error",
     });
   }
 };
+//GET THE USER'S BOOKING
+// export const getMyBookings = async (req, res) => {
+//   try {
+//     //GET THE USER ID FROM REQ BODY
+//     // const userId = req.params.id;
+//     const userId = req.user.id;
+//     if (!mongoose.Types.ObjectId.isValid(userId)) {
+//       return res.status(400).json({ message: "Invalid user ID" });
+//     }
+//     //FINDING THE USERS BOOKING IN DB
+//     const bookings = await Booking.find({ user: userId }).populate([
+//       "service",
+//       "staff",
+//     ]);
+//     if (bookings.length === 0) {
+//       return res.status(404).json({
+//         message: "You don't have any bookings",
+//       });
+//     }
+//     //SENDING THE DATA TO FRONTEND
+//     return res.status(200).json({
+//       success: true,
+//       count: bookings.length,
+//       data: bookings,
+//     });
+//   } catch (e) {
+//     return res.status(500).json({
+//       message: "Server error",
+//     });
+//   }
+// };
 
 // export const updateBookingStatus = async (req, res) => {
 //   try {
@@ -190,7 +267,7 @@ export const updateBookingStatus = async (req, res) => {
     // DIFFERENCE BETWEEN Request.USER.ID AND REQ.PARAMS IS THAT I CAN GET THE PARAMS
     // FROM THE ROUTE BUT I HAVE TO GET THE USER ID FROM THE DATA
     const { id } = req.params;
-    const { status, date, time, note } = req.body;
+    const { status, date, time, notes } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid ID" });
@@ -226,7 +303,7 @@ export const updateBookingStatus = async (req, res) => {
 
     if (date) booking.date = date;
     if (time) booking.time = time;
-    if (note !== undefined) booking.notes = note;
+    if (notes !== undefined) booking.notes = notes;
     //SAVING IN DB
     await booking.save();
 
