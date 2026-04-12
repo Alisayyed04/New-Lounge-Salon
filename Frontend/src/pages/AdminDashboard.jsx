@@ -1,23 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import DashboardCard from "../components/DashboardCard";
 
 export default function AdminDashboard() {
-    const [stats, setStats] = useState({
-        total: 0,
-        pending: 0,
-        confirmed: 0,
-        completed: 0,
-        cancelled: 0,
-        revenue: 0,
-    });
+    const [bookings, setBookings] = useState([]);
 
-    const [recentBookings, setRecentBookings] = useState([]);
+    const [filter, setFilter] = useState("all");
+    const [sort, setSort] = useState("");
 
+    const token = localStorage.getItem("token");
+
+    // ✅ FETCH ONLY (no extra logic)
     useEffect(() => {
-        const fetchData = async () => {
-            const token = localStorage.getItem("token");
-
+        const fetchBookings = async () => {
             try {
                 const res = await axios.get(
                     "http://localhost:8080/api/bookings",
@@ -28,41 +23,80 @@ export default function AdminDashboard() {
                     }
                 );
 
-                const bookings = res.data.data || [];
-
-                // ✅ stats calculation
-                const statsData = {
-                    total: bookings.length,
-                    pending: bookings.filter(b => b.status === "pending").length,
-                    confirmed: bookings.filter(b => b.status === "confirmed").length,
-                    completed: bookings.filter(b => b.status === "completed").length,
-                    cancelled: bookings.filter(b => b.status === "cancelled").length,
-                    revenue: bookings
-                        .filter(b => b.status === "completed")
-                        .reduce((acc, b) => acc + (b.totalPrice || 0), 0),
-                };
-
-                setStats(statsData);
-
-                // ✅ latest 5 bookings
-                const sorted = [...bookings].reverse().slice(0, 5);
-                setRecentBookings(sorted);
-
+                setBookings(res.data.data || []);
             } catch (err) {
-                console.log(err.response?.data || err.message);
+                console.log(err);
             }
         };
 
-        fetchData();
-    }, []);
+        fetchBookings();
+    }, [token]);
+
+    // ✅ DERIVED FILTERED DATA (NO STATE)
+    const filtered = useMemo(() => {
+        let temp = [...bookings];
+
+        if (filter !== "all") {
+            temp = temp.filter(b => b.status === filter);
+        }
+
+        if (sort === "date") {
+            temp.sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+
+        if (sort === "price") {
+            temp.sort((a, b) => (b.totalPrice || 0) - (a.totalPrice || 0));
+        }
+
+        return temp;
+    }, [bookings, filter, sort]);
+
+    // ✅ DERIVED STATS (NO STATE)
+    const stats = useMemo(() => {
+        return {
+            total: bookings.length,
+            pending: bookings.filter(b => b.status === "pending").length,
+            confirmed: bookings.filter(b => b.status === "confirmed").length,
+            completed: bookings.filter(b => b.status === "completed").length,
+            cancelled: bookings.filter(b => b.status === "cancelled").length,
+            revenue: bookings
+                .filter(b => b.status === "completed")
+                .reduce((acc, b) => acc + (b.totalPrice || 0), 0),
+        };
+    }, [bookings]);
+
+    // ✅ UPDATE STATUS (SAFE)
+    const updateStatus = async (id, status) => {
+        try {
+            await axios.put(
+                `http://localhost:8080/api/bookings/${id}`,
+                { status },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            // update locally
+            setBookings(prev =>
+                prev.map(b =>
+                    b._id === id ? { ...b, status } : b
+                )
+            );
+
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     return (
-        <div>
-            <h1>Admin Dashboard</h1>
+        <div >
+            <h1>📊 Admin Dashboard</h1>
 
-            {/* 🔥 STATS */}
-            <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-                <DashboardCard title="Total Bookings" value={stats.total} />
+            {/* STATS */}
+            <div >
+                <DashboardCard title="Total" value={stats.total} />
                 <DashboardCard title="Pending" value={stats.pending} />
                 <DashboardCard title="Confirmed" value={stats.confirmed} />
                 <DashboardCard title="Completed" value={stats.completed} />
@@ -70,23 +104,45 @@ export default function AdminDashboard() {
                 <DashboardCard title="Revenue" value={`₹${stats.revenue}`} />
             </div>
 
-            {/* 🔥 RECENT BOOKINGS */}
-            <div style={{ marginTop: "40px" }}>
-                <h2>Recent Bookings</h2>
+            {/* CONTROLS */}
+            <div >
+                <select onChange={(e) => setFilter(e.target.value)}>
+                    <option value="all">All</option>
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
 
-                {recentBookings.length === 0 ? (
-                    <p>No recent bookings</p>
-                ) : (
-                    recentBookings.map((b) => (
-                        <div key={b._id} style={{ borderBottom: "1px solid #ccc", padding: "10px 0" }}>
-                            <p><strong>{b.service?.name}</strong></p>
-                            <p>{b.user?.name}</p>
-                            <p>{b.date?.split("T")[0]} - {b.time}</p>
-                            <p>Status: {b.status}</p>
-                        </div>
-                    ))
-                )}
+                <select onChange={(e) => setSort(e.target.value)}>
+                    <option value="">Sort</option>
+                    <option value="date">Latest</option>
+                    <option value="price">Highest Price</option>
+                </select>
             </div>
+
+            {/* BOOKINGS */}
+            {filtered.map((b) => (
+                <div key={b._id} >
+                    <h3>{b.service?.name}</h3>
+                    <p>{b.user?.name}</p>
+                    <p>{b.date?.split("T")[0]} | {b.time}</p>
+                    <p>Status: <strong>{b.status}</strong></p>
+                    <p>₹{b.totalPrice}</p>
+
+                    <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+                        <button onClick={() => updateStatus(b._id, "confirmed")}>
+                            Confirm
+                        </button>
+                        <button onClick={() => updateStatus(b._id, "completed")}>
+                            Complete
+                        </button>
+                        <button onClick={() => updateStatus(b._id, "cancelled")}>
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            ))}
         </div>
     );
 }

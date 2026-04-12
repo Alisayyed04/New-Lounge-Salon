@@ -27,7 +27,7 @@ export default function Navbar({ user, setUser }) {
                 )}
 
                 <li><Link to="/about">About Us</Link></li>
-                <li><Link to="/contact">Contact</Link></li>
+                <li><Link to="/contact">Contact Us</Link></li>
 
                 {/* Auth Section */}
                 {!token ? (

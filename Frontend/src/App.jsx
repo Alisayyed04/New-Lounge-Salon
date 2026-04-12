@@ -22,7 +22,7 @@ import CreateAdmin from "./pages/CreateAdmin.jsx";
 import AdminBookings from "./pages/AllBooking.jsx";
 import AboutUs from "./pages/AboutUs.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
-
+import Contact from "./pages/ContactUs.jsx";
 function App() {
 
   const [isOpen, setIsOpen] = useState(true);
@@ -38,7 +38,7 @@ function App() {
       <Navbar setUser={setUser} />
 
       {user?.role === "admin" && (
-        <AdminSidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+        <AdminSidebar isOpen={isOpen} setIsOpen={setIsOpen} setUser={setUser} />
       )}
 
       <div
@@ -55,6 +55,7 @@ function App() {
           <Route path="/register" element={<RegisterUser />} />
           <Route path="/services" element={<Services />} />
           <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<Contact />} />
           {/* BOOKINGS */}
           <Route path="/bookings/:id" element={<CreateBooking />} />
           <Route path="/booking/:id" element={<Booking />} />

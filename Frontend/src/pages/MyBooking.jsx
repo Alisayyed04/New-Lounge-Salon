@@ -39,7 +39,7 @@ export default function MyBooking() {
         };
 
         getData();
-    }, [showAlert]);
+    }, []);
 
     const handleDelete = async (id) => {
         const confirmDelete = window.confirm("Delete this booking?");
