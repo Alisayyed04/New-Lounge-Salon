@@ -1,10 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useAlert } from "../context/AlertContext";
 
 export default function CreateBooking() {
     const navigate = useNavigate();
     const { id: ID } = useParams();
+    const { showAlert } = useAlert();
 
     const [serviceData, setServiceData] = useState({});
     const [bookedSlots, setBookedSlots] = useState([]);
@@ -46,8 +48,11 @@ export default function CreateBooking() {
                     ...prev,
                     totalPrice: service.price,
                 }));
-            } catch (e) {
-                console.log(e);
+
+            } catch (err) {
+                showAlert(
+                    err.response?.data?.message || "Failed to load service"
+                );
             }
         };
 
@@ -70,7 +75,6 @@ export default function CreateBooking() {
                 const slots = Array.isArray(res.data) ? res.data : [];
                 setBookedSlots(slots);
 
-                // ✅ ONLY auto-set if user hasn't selected anything
                 if (!formData.time) {
                     const available = allSlots.find(
                         (s) => !slots.includes(s)
@@ -84,21 +88,22 @@ export default function CreateBooking() {
                     }
                 }
             } catch (err) {
-                console.log(err);
+                showAlert(
+                    err.response?.data?.message || "Failed to fetch available slots"
+                );
             }
         };
 
         fetchSlots();
     }, [formData.date]);
 
-    // ✅ FIXED PAST TIME CHECK
+    // ✅ CHECK PAST TIME
     const isPastTime = (slot) => {
         if (!formData.date) return false;
 
         const now = new Date();
         const selectedDate = new Date(formData.date);
 
-        // only check if same day
         if (selectedDate.toDateString() !== now.toDateString()) {
             return false;
         }
@@ -115,7 +120,7 @@ export default function CreateBooking() {
         e.preventDefault();
 
         if (!formData.date || !formData.time) {
-            alert("Select date and time");
+            showAlert("Select date and time");
             return;
         }
 
@@ -135,9 +140,13 @@ export default function CreateBooking() {
                 }
             );
 
+            showAlert("Booking created successfully", "success");
             navigate(`/booking/${res.data.data._id}`);
-        } catch (e) {
-            console.log(e.response?.data || e.message);
+
+        } catch (err) {
+            showAlert(
+                err.response?.data?.message || "Failed to create booking"
+            );
         }
     };
 
@@ -163,7 +172,7 @@ export default function CreateBooking() {
                         setFormData((prev) => ({
                             ...prev,
                             date: e.target.value,
-                            time: "", // reset time when date changes
+                            time: "",
                         }))
                     }
                 />

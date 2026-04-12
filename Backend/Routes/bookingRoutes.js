@@ -16,10 +16,10 @@ const router = express.Router();
 router.get("/slots", getBookedSlots);
 
 // CREATE BOOKING
-router.post("/", protect, authorizeRoles("customer"), createBooking);
+router.post("/", protect, authorizeRoles("customer", "admin"), createBooking);
 
 // SPECIAL ROUTES FIRST
-router.get("/my", protect, authorizeRoles("customer"), getMyBookings);
+router.get("/my", protect, authorizeRoles("customer", "admin"), getMyBookings);
 
 // GENERAL ROUTES
 router.get("/", protect, authorizeRoles("admin", "customer"), getBookings);

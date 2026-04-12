@@ -1,10 +1,13 @@
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import { useAlert } from "../context/AlertContext";
 
 export default function EditBooking() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { showAlert } = useAlert();
 
     const [bookedSlots, setBookedSlots] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -23,7 +26,7 @@ export default function EditBooking() {
             for (let min = 0; min < 60; min += interval) {
                 const h = String(hour).padStart(2, "0");
                 const m = String(min).padStart(2, "0");
-                slots.push(`${h}:${m}`);
+                slots.push(`${h}:${m} `);
             }
         }
         return slots;
@@ -37,6 +40,7 @@ export default function EditBooking() {
             const token = localStorage.getItem("token");
 
             if (!token) {
+                showAlert("Login required");
                 navigate("/login");
                 return;
             }
@@ -62,15 +66,18 @@ export default function EditBooking() {
 
                 setLoading(false);
             } catch (err) {
-                console.log(err);
-                navigate("/"); // fallback
+                showAlert(
+                    err.response?.data?.message ||
+                    "Failed to load booking"
+                );
+                navigate("/");
             }
         };
 
         fetchBooking();
-    }, [id, navigate]);
+    }, [id]);
 
-    // ✅ FETCH BOOKED SLOTS WHEN DATE CHANGES
+    // ✅ FETCH BOOKED SLOTS
     useEffect(() => {
         const fetchSlots = async () => {
             if (!formData.date) return;
@@ -83,14 +90,12 @@ export default function EditBooking() {
                     }
                 );
 
-                // ❗ Remove current slot so user can keep same time
                 const filtered = res.data.filter(
                     (slot) => slot !== formData.time
                 );
 
                 setBookedSlots(filtered);
 
-                // AUTO PICK AVAILABLE SLOT (if current is invalid)
                 if (filtered.includes(formData.time)) {
                     const available = allSlots.find(
                         (s) => !filtered.includes(s)
@@ -104,12 +109,41 @@ export default function EditBooking() {
                     }
                 }
             } catch (err) {
-                console.log(err);
+                showAlert(
+                    err.response?.data?.message || "Failed to fetch slots");
             }
         };
 
         fetchSlots();
     }, [formData.date]);
+
+    // ✅ VALIDATION (STRICT)
+    const validateForm = () => {
+        if (!formData.date) return "Date is required";
+        if (!formData.time) return "Time is required";
+
+        const selectedDate = new Date(formData.date);
+        const today = new Date();
+
+        if (selectedDate < new Date(today.toDateString())) {
+            return "Cannot select past date";
+        }
+
+        if (isPastTime(formData.time)) {
+            return "Cannot select past time";
+        }
+
+        const validStatuses = ["pending", "confirmed", "completed", "cancelled"];
+        if (!validStatuses.includes(formData.status)) {
+            return "Invalid status";
+        }
+
+        if (formData.notes.length > 200) {
+            return "Notes too long (max 200 chars)";
+        }
+
+        return null;
+    };
 
     // ✅ PAST TIME CHECK
     const isPastTime = (slot) => {
@@ -139,8 +173,14 @@ export default function EditBooking() {
         const token = localStorage.getItem("token");
 
         if (!token) {
-            alert("Login required");
+            showAlert("Login required");
             navigate("/login");
+            return;
+        }
+
+        const validationError = validateForm();
+        if (validationError) {
+            showAlert(validationError);
             return;
         }
 
@@ -160,11 +200,12 @@ export default function EditBooking() {
                 }
             );
 
-            alert("Booking updated ✅");
+            showAlert("Booking updated successfully ✅", "success");
             navigate("/");
         } catch (err) {
-            console.log(err);
-            alert("Update failed ❌");
+            showAlert(
+                err.response?.data?.message || "Update failed ❌"
+            );
         }
     };
 

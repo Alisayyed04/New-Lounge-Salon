@@ -1,12 +1,13 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import ServiceCard from "../components/ServiceCard";
+import { useAlert } from "../context/AlertContext";
 
 export default function Home() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { showAlert } = useAlert();
 
-    // ✅ get user OUTSIDE useEffect
     const user = JSON.parse(localStorage.getItem("user"));
 
     useEffect(() => {
@@ -18,14 +19,17 @@ export default function Home() {
 
                 setData(req.data.data);
             } catch (e) {
-                console.log("Error:", e.message || e.response);
+                showAlert(
+                    e.response?.data?.message ||
+                    "Failed to load services ❌"
+                );
             } finally {
                 setLoading(false);
             }
         };
 
         fetchData();
-    }, []);
+    }, [showAlert]);
 
     return (
         <div>

@@ -1,11 +1,14 @@
+
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAlert } from "../context/AlertContext";
 
 export default function ServiceCard({ service, isAdmin }) {
     const navigate = useNavigate();
+    const { showAlert } = useAlert();
 
     const handleDelete = async () => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this service?");
+        const confirmDelete = window.confirm("Delete this service?");
         if (!confirmDelete) return;
 
         const token = localStorage.getItem("token");
@@ -20,23 +23,19 @@ export default function ServiceCard({ service, isAdmin }) {
                 }
             );
 
-            alert("Service deleted ✅");
-
-            // simple refresh (you can optimize later)
+            showAlert("Service deleted", "success");
             window.location.reload();
 
         } catch (err) {
-            console.log("Delete error:", err.message || err.response);
-            alert("Failed to delete ❌");
+            showAlert(err.response?.data?.message || "Delete failed", "error");
         }
     };
 
     return (
-        <div >
-            {/* Service Info */}
+        <div>
             <img
                 src={service.image || "https://via.placeholder.com/200"}
-                alt={service.name}
+                alt=""
                 width="200"
             />
 
@@ -46,26 +45,17 @@ export default function ServiceCard({ service, isAdmin }) {
             <p>Category: {service.category}</p>
             <p>Duration: {service.duration} mins</p>
 
-            {/* USER ACTION */}
             <button onClick={() => navigate(`/bookings/${service._id}`)}>
                 Book Now
             </button>
 
-            <button onClick={() => navigate("/")}>
-                View Gallery **Coming Soon**
-            </button>
-
-            {/* ADMIN ONLY */}
             {isAdmin && (
                 <div>
-                    <button onClick={() => {
-                        console.log("EDIT CLICKED:", service._id);
-                        navigate(`/editservice/${service._id}`);
-                    }}>
+                    <button onClick={() => navigate(`/editservice/${service._id}`)}>
                         Edit
                     </button>
 
-                    <button onClick={handleDelete} >
+                    <button onClick={handleDelete}>
                         Delete
                     </button>
                 </div>

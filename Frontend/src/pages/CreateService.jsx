@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAlert } from "../context/AlertContext";
 
 export default function CreateService() {
     const navigate = useNavigate();
+    const { showAlert } = useAlert();
 
     const [formData, setFormData] = useState({
         name: "",
@@ -14,15 +16,13 @@ export default function CreateService() {
         image: null,
     });
 
-    const [error, setError] = useState("");
-
     // ✅ Protect route (ADMIN ONLY)
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("user"));
         const token = localStorage.getItem("token");
 
         if (!token || user?.role !== "admin") {
-            alert("Unauthorized ❌");
+            showAlert("Unauthorized ❌");
             navigate("/");
         }
     }, []);
@@ -60,12 +60,13 @@ export default function CreateService() {
 
         return null;
     };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         const validationError = validateForm();
         if (validationError) {
-            setError(validationError);
+            showAlert(validationError);
             return;
         }
 
@@ -80,7 +81,6 @@ export default function CreateService() {
             data.append("duration", formData.duration);
             data.append("category", formData.category);
 
-            // 🔥 VERY IMPORTANT (must match multer field name)
             if (formData.image) {
                 data.append("image", formData.image);
             }
@@ -96,19 +96,19 @@ export default function CreateService() {
                 }
             );
 
-            alert("Service created ✅");
+            showAlert("Service created successfully ✅", "success");
             navigate("/");
 
         } catch (err) {
-            console.log(err.response?.data || err.message);
-            setError("Error creating service ❌");
+            showAlert(
+                err.response?.data?.message || "Error creating service ❌"
+            );
         }
     };
+
     return (
         <div>
             <h2>Create Service (Admin)</h2>
-
-            {error && <p style={{ color: "red" }}>{error}</p>}
 
             <form onSubmit={handleSubmit}>
                 <input
@@ -152,7 +152,6 @@ export default function CreateService() {
                     <option value="makeup">Makeup</option>
                 </select>
 
-                {/* 🔥 IMAGE INPUT */}
                 <input
                     type="file"
                     name="image"

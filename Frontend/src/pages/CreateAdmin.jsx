@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { useAlert } from "../context/AlertContext";
 
 export default function CreateAdmin() {
     const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ export default function CreateAdmin() {
         phone: "",
     });
 
+    const { showAlert } = useAlert();
     const token = localStorage.getItem("token");
 
     const handleChange = (e) => {
@@ -18,8 +20,38 @@ export default function CreateAdmin() {
         });
     };
 
+    const validateForm = () => {
+        const { name, email, password, phone } = formData;
+
+        if (!name || !email || !password) {
+            return "All fields are required";
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return "Invalid email format";
+        }
+
+        if (password.length < 6) {
+            return "Password must be at least 6 characters";
+        }
+
+        const phoneRegex = /^[6-9]\d{9}$/;
+        if (phone && !phoneRegex.test(phone)) {
+            return "Invalid phone number";
+        }
+
+        return null;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const error = validateForm();
+        if (error) {
+            showAlert(error);
+            return;
+        }
 
         try {
             await axios.post(
@@ -32,18 +64,18 @@ export default function CreateAdmin() {
                 }
             );
 
-            alert("Admin created successfully");
+            showAlert("Admin created successfully", "success");
 
-            // reset form
             setFormData({
                 name: "",
                 email: "",
                 password: "",
                 phone: "",
             });
-        } catch (error) {
-            console.log(error.response?.data || error.message);
-            alert(error.response?.data?.message || "Error creating admin");
+        } catch (err) {
+            showAlert(
+                err.response?.data?.message || "Error creating admin"
+            );
         }
     };
 

@@ -1,18 +1,25 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import BookingCard from "../components/BookingCard";
+import { useAlert } from "../context/AlertContext";
 
 export default function MyBooking() {
+    const { showAlert } = useAlert();
 
-
-    let [data, setData] = useState([]);
+    const [data, setData] = useState([]);
 
     useEffect(() => {
         const getData = async () => {
             const token = localStorage.getItem("token");
 
+            if (!token) {
+                showAlert("Login required");
+                setData([]);
+                return;
+            }
+
             try {
-                let req = await axios.get(
+                const req = await axios.get(
                     "http://localhost:8080/api/bookings/my",
                     {
                         headers: {
@@ -21,18 +28,18 @@ export default function MyBooking() {
                     }
                 );
 
-                console.log("success", req.data);
-
                 setData(req.data.data || []);
-
             } catch (e) {
                 setData([]);
-                console.log("Error", e.message || e.reponse);// ✅ prevents crash
+                showAlert(
+                    e.response?.data?.message ||
+                    "Failed to fetch bookings ❌"
+                );
             }
         };
 
         getData();
-    }, []);
+    }, [showAlert]);
 
     const handleDelete = async (id) => {
         const confirmDelete = window.confirm("Delete this booking?");
@@ -50,11 +57,13 @@ export default function MyBooking() {
                 }
             );
 
-
             setData((prev) => prev.filter((b) => b._id !== id));
-
+            showAlert("Booking deleted ✅", "success");
         } catch (err) {
-            console.log(err.message || err.response);
+            showAlert(
+                err.response?.data?.message ||
+                "Failed to delete booking ❌"
+            );
         }
     };
 

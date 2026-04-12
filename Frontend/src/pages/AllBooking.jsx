@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import BookingCard from "../components/BookingCard";
+import { useAlert } from "../context/AlertContext";
 
 export default function AdminBookings() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { showAlert } = useAlert();
 
     useEffect(() => {
         const getAllBookings = async () => {
@@ -21,8 +23,12 @@ export default function AdminBookings() {
                 );
 
                 setData(res.data.data);
+                showAlert("Bookings loaded successfully", "success");
+
             } catch (err) {
-                console.log(err.message || err.response);
+                showAlert(
+                    err.response?.data?.message || "Failed to fetch bookings"
+                );
             } finally {
                 setLoading(false);
             }
@@ -47,11 +53,13 @@ export default function AdminBookings() {
                 }
             );
 
-
             setData((prev) => prev.filter((b) => b._id !== id));
+            showAlert("Booking deleted successfully", "success");
 
         } catch (err) {
-            console.log(err.message || err.response);
+            showAlert(
+                err.response?.data?.message || "Failed to delete booking"
+            );
         }
     };
 
@@ -65,8 +73,11 @@ export default function AdminBookings() {
                 <p>No bookings found</p>
             ) : (
                 data.map((booking) => (
-                    <BookingCard key={booking._id} booking={booking}
-                        onDelete={handleDelete} />
+                    <BookingCard
+                        key={booking._id}
+                        booking={booking}
+                        onDelete={handleDelete}
+                    />
                 ))
             )}
         </>

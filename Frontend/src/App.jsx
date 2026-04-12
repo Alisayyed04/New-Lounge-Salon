@@ -21,6 +21,7 @@ import Home from "./pages/Home.jsx";
 import CreateAdmin from "./pages/CreateAdmin.jsx";
 import AdminBookings from "./pages/AllBooking.jsx";
 import AboutUs from "./pages/AboutUs.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
 
 function App() {
 
@@ -61,7 +62,7 @@ function App() {
           <Route path="/editbooking/:id" element={<EditBooking />} />
 
           {/* ADMIN */}
-          <Route path="/admin/dashboard" element={<Admin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/create" element={<CreateAdmin />} />
           <Route path="/admin/bookings" element={<AdminBookings />} />
           <Route path="/createservice" element={<CreateService />} />
