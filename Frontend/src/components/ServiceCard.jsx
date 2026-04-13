@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAlert } from "../context/AlertContext";
 import API from "../config/api";
-export default function ServiceCard({ service, isAdmin }) {
+export default function ServiceCard({ service, isAdmin, onDelete }) {
     const navigate = useNavigate();
     const { showAlert } = useAlert();
 
@@ -23,7 +23,7 @@ export default function ServiceCard({ service, isAdmin }) {
             );
 
             showAlert("Service deleted", "success");
-            window.location.reload();
+            onDelete(service._id);
         } catch (err) {
             showAlert(err.response?.data?.message || "Delete failed", "error");
         }

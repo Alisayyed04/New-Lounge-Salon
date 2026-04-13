@@ -66,7 +66,10 @@ export default function Services() {
         "all",
         ...new Set(data.map((s) => s.category.toLowerCase().trim())),
     ];
-
+    const handleDeleteUI = (id) => {
+        setData(prev => prev.filter(s => s._id !== id));
+        setFilteredData(prev => prev.filter(s => s._id !== id));
+    };
     return (
         <section className="min-h-screen bg-[#0a0a0a] text-white px-6 py-16">
 
@@ -149,6 +152,7 @@ export default function Services() {
                                 <ServiceCard
                                     service={service}
                                     isAdmin={user?.role === "admin"}
+                                    onDelete={handleDeleteUI}
                                 />
                             </div>
                         ))}
