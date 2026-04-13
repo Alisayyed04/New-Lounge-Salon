@@ -13,10 +13,17 @@ import { errorHandler } from "./Middlewares/errorMiddleware.js";
 import { logger, notFound } from "./Middlewares/authMiddleware.js";
 
 const app = express();
-
+const PORT = process.env.PORT || 8080;
 // 🔴 MIDDLEWARES
 app.use(express.json());
-app.use(cors());
+const allowedOrigins = ["http://localhost:5173", process.env.FRONTEND_URL];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  }),
+);
 app.use(logger);
 
 // 🔴 ROUTES
@@ -36,6 +43,7 @@ app.use(errorHandler);
 connectDB();
 
 // 🔴 SERVER
-app.listen(8080, () => {
-  console.log("server is listening on port 8080");
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

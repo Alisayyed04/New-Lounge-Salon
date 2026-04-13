@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAlert } from "../context/AlertContext";
-
+import API from "../config/api";
 export default function RegisterUser() {
     const navigate = useNavigate();
     const { showAlert } = useAlert();
@@ -75,7 +75,7 @@ export default function RegisterUser() {
             });
 
             const res = await axios.post(
-                "http://localhost:8080/api/users/register",
+                `${API}/api/users/register`,
                 data
             );
 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useAlert } from "../context/AlertContext";
+import API from "../config/api";
 
 export default function CreateAdmin() {
     const [formData, setFormData] = useState({
@@ -55,7 +56,7 @@ export default function CreateAdmin() {
 
         try {
             await axios.post(
-                "http://localhost:8080/api/users/admin/create",
+                `${API}/api/users/admin/create`,
                 formData,
                 {
                     headers: {

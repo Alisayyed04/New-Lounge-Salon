@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAlert } from "../context/AlertContext";
-
+import API from "../config/api";
 export default function LoginUser({ setUser }) {
     const navigate = useNavigate();
     const { showAlert } = useAlert();
@@ -43,7 +43,7 @@ export default function LoginUser({ setUser }) {
 
         try {
             const res = await axios.post(
-                "http://localhost:8080/api/users/login",
+                `${API}/api/users/login`,
                 formData
             );
 

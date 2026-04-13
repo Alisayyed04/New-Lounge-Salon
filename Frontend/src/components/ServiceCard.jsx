@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAlert } from "../context/AlertContext";
-
+import API from "../config/api";
 export default function ServiceCard({ service, isAdmin }) {
     const navigate = useNavigate();
     const { showAlert } = useAlert();
@@ -14,7 +14,7 @@ export default function ServiceCard({ service, isAdmin }) {
 
         try {
             await axios.delete(
-                `http://localhost:8080/api/services/${service._id}`,
+                `${API}/api/services/${service._id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

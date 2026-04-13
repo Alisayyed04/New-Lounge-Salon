@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import BookingCard from "../components/BookingCard";
 import { useAlert } from "../context/AlertContext";
-
+import API from "../config/api";
 export default function MyBooking() {
     const { showAlert } = useAlert();
     const [data, setData] = useState([]);
@@ -19,7 +19,7 @@ export default function MyBooking() {
 
             try {
                 const req = await axios.get(
-                    "http://localhost:8080/api/bookings/my",
+                    `${API}/api/bookings/my`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -48,7 +48,7 @@ export default function MyBooking() {
 
         try {
             await axios.delete(
-                `http://localhost:8080/api/bookings/${id}`,
+                `${API}/api/bookings/${id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

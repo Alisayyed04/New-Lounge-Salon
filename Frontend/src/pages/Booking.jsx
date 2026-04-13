@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { useAlert } from "../context/AlertContext";
-
+import API from "../config/api";
 export default function Booking() {
     let { id: ID } = useParams();
     let [data, setData] = useState(null);
@@ -14,7 +14,7 @@ export default function Booking() {
 
             try {
                 let res = await axios.get(
-                    "http://localhost:8080/api/bookings/" + ID,
+                    `${API}/api/bookings/` + ID,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAlert } from "../context/AlertContext";
-
+import API from "../config/api";
 export default function EditService() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -38,7 +38,7 @@ export default function EditService() {
 
             try {
                 const res = await axios.get(
-                    `http://localhost:8080/api/services/${id}`,
+                    `${API}/api/services/${id}`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -160,7 +160,7 @@ export default function EditService() {
             }
 
             await axios.put(
-                `http://localhost:8080/api/services/${id}`,
+                `${API}/api/services/${id}`,
                 data,
                 {
                     headers: {

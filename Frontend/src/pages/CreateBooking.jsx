@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAlert } from "../context/AlertContext";
-
+import API from "../config/api";
 export default function CreateBooking() {
     const navigate = useNavigate();
     const { id: ID } = useParams();
@@ -39,7 +39,7 @@ export default function CreateBooking() {
         const getService = async () => {
             try {
                 const res = await axios.get(
-                    `http://localhost:8080/api/services/${ID}`
+                    `${API}/api/services/${ID}`
                 );
 
                 const service = res.data.data;
@@ -69,7 +69,7 @@ export default function CreateBooking() {
 
             try {
                 const res = await axios.get(
-                    "http://localhost:8080/api/bookings/slots",
+                    `${API}/api/bookings/slots`,
                     {
                         params: { date: formData.date },
                     }
@@ -135,7 +135,7 @@ export default function CreateBooking() {
             const token = localStorage.getItem("token");
 
             const res = await axios.post(
-                "http://localhost:8080/api/bookings/",
+                `${API}/api/bookings/`,
                 {
                     ...formData,
                     service: ID,

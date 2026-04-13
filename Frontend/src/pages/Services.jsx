@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import ServiceCard from "../components/ServiceCard";
 import { useAlert } from "../context/AlertContext";
-
+import API from "../config/api";
 export default function Services() {
     const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
@@ -19,7 +19,7 @@ export default function Services() {
         const fetchData = async () => {
             try {
                 const req = await axios.get(
-                    "http://localhost:8080/api/services"
+                    `${API}/api/services`
                 );
 
                 setData(req.data.data);

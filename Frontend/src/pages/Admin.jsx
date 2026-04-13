@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useAlert } from "../context/AlertContext";
-
+import API from "../config/api";
 export default function Admin() {
     const [data, setData] = useState([]);
     const { showAlert } = useAlert();
@@ -12,7 +12,7 @@ export default function Admin() {
 
             try {
                 const res = await axios.get(
-                    "http://localhost:8080/api/bookings",
+                    `${API}/api/bookings`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,

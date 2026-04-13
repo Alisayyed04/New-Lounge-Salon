@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAlert } from "../context/AlertContext";
-
+import API from "../config/api";
 export default function EditBooking() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -44,7 +44,7 @@ export default function EditBooking() {
 
             try {
                 const res = await axios.get(
-                    `http://localhost:8080/api/bookings/${id}`,
+                    `${API}/api/bookings/${id}`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -80,7 +80,7 @@ export default function EditBooking() {
 
             try {
                 const res = await axios.get(
-                    "http://localhost:8080/api/bookings/slots",
+                    `${API}/api/bookings/slots`,
                     {
                         params: { date: formData.date },
                     }
@@ -178,7 +178,7 @@ export default function EditBooking() {
 
         try {
             await axios.put(
-                `http://localhost:8080/api/bookings/${id}`,
+                `${API}/api/bookings/${id}`,
                 {
                     date: formData.date,
                     time: formData.time,

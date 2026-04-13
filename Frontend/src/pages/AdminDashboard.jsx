@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import DashboardCard from "../components/DashboardCard";
-
+import API from "../config/api";
 export default function AdminDashboard() {
     const [bookings, setBookings] = useState([]);
 
@@ -14,7 +14,7 @@ export default function AdminDashboard() {
         const fetchBookings = async () => {
             try {
                 const res = await axios.get(
-                    "http://localhost:8080/api/bookings",
+                    `${API}/api/bookings`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -65,7 +65,7 @@ export default function AdminDashboard() {
     const updateStatus = async (id, status) => {
         try {
             await axios.put(
-                `http://localhost:8080/api/bookings/${id}`,
+                `${API}/api/bookings/${id}`,
                 { status },
                 {
                     headers: {

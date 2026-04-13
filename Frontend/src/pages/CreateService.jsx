@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAlert } from "../context/AlertContext";
-
+import API from "../config/api";
 export default function CreateService() {
     const navigate = useNavigate();
     const { showAlert } = useAlert();
@@ -93,7 +93,7 @@ export default function CreateService() {
             }
 
             await axios.post(
-                "http://localhost:8080/api/services/",
+                `${API}/api/services/`,
                 data,
                 {
                     headers: {
