@@ -10,7 +10,6 @@ export default function AdminDashboard() {
 
     const token = localStorage.getItem("token");
 
-    // ✅ FETCH ONLY (no extra logic)
     useEffect(() => {
         const fetchBookings = async () => {
             try {
@@ -32,7 +31,6 @@ export default function AdminDashboard() {
         fetchBookings();
     }, [token]);
 
-    // ✅ DERIVED FILTERED DATA (NO STATE)
     const filtered = useMemo(() => {
         let temp = [...bookings];
 
@@ -51,7 +49,6 @@ export default function AdminDashboard() {
         return temp;
     }, [bookings, filter, sort]);
 
-    // ✅ DERIVED STATS (NO STATE)
     const stats = useMemo(() => {
         return {
             total: bookings.length,
@@ -65,7 +62,6 @@ export default function AdminDashboard() {
         };
     }, [bookings]);
 
-    // ✅ UPDATE STATUS (SAFE)
     const updateStatus = async (id, status) => {
         try {
             await axios.put(
@@ -78,7 +74,6 @@ export default function AdminDashboard() {
                 }
             );
 
-            // update locally
             setBookings(prev =>
                 prev.map(b =>
                     b._id === id ? { ...b, status } : b
@@ -91,22 +86,43 @@ export default function AdminDashboard() {
     };
 
     return (
-        <div >
-            <h1>📊 Admin Dashboard</h1>
+        <div className="relative text-white px-6 py-16 max-w-7xl mx-auto">
+
+            {/* HEADER */}
+            <h1 className="text-4xl font-bold mb-10">
+                <span className="bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                    Admin Dashboard
+                </span>
+            </h1>
 
             {/* STATS */}
-            <div >
-                <DashboardCard title="Total" value={stats.total} />
-                <DashboardCard title="Pending" value={stats.pending} />
-                <DashboardCard title="Confirmed" value={stats.confirmed} />
-                <DashboardCard title="Completed" value={stats.completed} />
-                <DashboardCard title="Cancelled" value={stats.cancelled} />
-                <DashboardCard title="Revenue" value={`₹${stats.revenue}`} />
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-12">
+                <div className="col-span-1">
+                    <DashboardCard title="Total" value={stats.total} />
+                </div>
+                <div className="col-span-1">
+                    <DashboardCard title="Pending" value={stats.pending} />
+                </div>
+                <div className="col-span-1">
+                    <DashboardCard title="Confirmed" value={stats.confirmed} />
+                </div>
+                <div className="col-span-1">
+                    <DashboardCard title="Completed" value={stats.completed} />
+                </div>
+                <div className="col-span-1">
+                    <DashboardCard title="Cancelled" value={stats.cancelled} />
+                </div>
+                <div className="col-span-1">
+                    <DashboardCard title="Revenue" value={`₹${stats.revenue}`} />
+                </div>
             </div>
 
             {/* CONTROLS */}
-            <div >
-                <select onChange={(e) => setFilter(e.target.value)}>
+            <div className="flex flex-wrap gap-4 mb-10">
+                <select
+                    onChange={(e) => setFilter(e.target.value)}
+                    className="bg-[#0f0f0f] border border-white/10 text-zinc-300 px-4 py-2 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+                >
                     <option value="all">All</option>
                     <option value="pending">Pending</option>
                     <option value="confirmed">Confirmed</option>
@@ -114,7 +130,10 @@ export default function AdminDashboard() {
                     <option value="cancelled">Cancelled</option>
                 </select>
 
-                <select onChange={(e) => setSort(e.target.value)}>
+                <select
+                    onChange={(e) => setSort(e.target.value)}
+                    className="bg-[#0f0f0f] border border-white/10 text-zinc-300 px-4 py-2 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+                >
                     <option value="">Sort</option>
                     <option value="date">Latest</option>
                     <option value="price">Highest Price</option>
@@ -122,27 +141,76 @@ export default function AdminDashboard() {
             </div>
 
             {/* BOOKINGS */}
-            {filtered.map((b) => (
-                <div key={b._id} >
-                    <h3>{b.service?.name}</h3>
-                    <p>{b.user?.name}</p>
-                    <p>{b.date?.split("T")[0]} | {b.time}</p>
-                    <p>Status: <strong>{b.status}</strong></p>
-                    <p>₹{b.totalPrice}</p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filtered.map((b) => (
+                    <div
+                        key={b._id}
+                        className="bg-gradient-to-b from-[#111] to-[#0a0a0a] 
+                        border border-white/5 
+                        backdrop-blur-xl 
+                        rounded-2xl p-6 
+                        shadow-[0_10px_40px_rgba(0,0,0,0.6)] 
+                        hover:border-yellow-500 
+                        hover:scale-[1.02] 
+                        transition-all duration-300"
+                    >
+                        <h3 className="text-lg font-semibold text-yellow-500 mb-2">
+                            {b.service?.name}
+                        </h3>
 
-                    <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
-                        <button onClick={() => updateStatus(b._id, "confirmed")}>
-                            Confirm
-                        </button>
-                        <button onClick={() => updateStatus(b._id, "completed")}>
-                            Complete
-                        </button>
-                        <button onClick={() => updateStatus(b._id, "cancelled")}>
-                            Cancel
-                        </button>
+                        <p className="text-zinc-400 text-sm">
+                            {b.user?.name}
+                        </p>
+
+                        <p className="text-zinc-400 text-sm">
+                            {b.date?.split("T")[0]} | {b.time}
+                        </p>
+
+                        <p className="text-sm mt-2">
+                            Status:{" "}
+                            <span
+                                className={`font-semibold 
+                                ${b.status === "pending"
+                                        ? "text-yellow-400"
+                                        : b.status === "confirmed"
+                                            ? "text-green-400"
+                                            : b.status === "completed"
+                                                ? "text-blue-400"
+                                                : "text-red-400"
+                                    }`}
+                            >
+                                {b.status}
+                            </span>
+                        </p>
+
+                        <p className="text-zinc-300 mt-2 font-medium">
+                            ₹{b.totalPrice}
+                        </p>
+
+                        <div className="flex gap-2 mt-5">
+                            <button
+                                onClick={() => updateStatus(b._id, "confirmed")}
+                                className="flex-1 py-2 rounded-lg bg-green-900 hover:bg-green-800 text-sm transition"
+                            >
+                                Confirm
+                            </button>
+                            <button
+                                onClick={() => updateStatus(b._id, "completed")}
+                                className="flex-1 py-2 rounded-lg bg-blue-900 hover:bg-blue-800 text-sm transition"
+                            >
+                                Complete
+                            </button>
+                            <button
+                                onClick={() => updateStatus(b._id, "cancelled")}
+                                className="flex-1 py-2 rounded-lg bg-red-900 hover:bg-red-800 text-sm transition"
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </div>
-                </div>
-            ))}
+                ))}
+            </div>
+
         </div>
     );
 }

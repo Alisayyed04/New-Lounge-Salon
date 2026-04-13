@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useAlert } from "../context/AlertContext";
 
@@ -11,40 +10,106 @@ export default function BookingCard({ booking, onDelete }) {
 
     if (!booking) return null;
 
+    // ✅ FIX CLOUDINARY IMAGE
+    const getImage = () => {
+        if (booking?.service?.image?.url) return booking.service.image.url;
+        if (booking?.service?.image) return booking.service.image;
+        if (booking?.service?.img) return booking.service.img;
+        return "/photos/default-service.jpg";
+    };
+
+    const date = booking?.date?.split("T")[0];
+
     return (
-        <div style={{ border: "1px solid #ccc", padding: "15px", marginBottom: "10px" }}>
-            {booking?.service?.image ? (
-                <img src={booking.service.image} alt="" width="120" />
-            ) : (
-                <p>No Image</p>
-            )}
+        <div className="bg-gradient-to-b from-[#111] to-[#0a0a0a] 
+        border border-white/5 
+        rounded-2xl 
+        overflow-hidden 
+        shadow-lg 
+        hover:shadow-yellow-500/10 
+        hover:border-yellow-500/40 
+        transition-all duration-300">
 
-            <h3>{booking?.service?.name}</h3>
-            <p>Category: {booking?.service?.category}</p>
-            <p>Price: ₹{booking?.totalPrice}</p>
-            <p>Date: {booking?.date?.split("T")[0]}</p>
-            <p>Time: {booking?.time}</p>
-            <p>Status: {booking?.status}</p>
+            {/* IMAGE */}
+            <div className="relative">
+                <img
+                    src={getImage()}
+                    alt={booking?.service?.name}
+                    className="w-full h-48 object-cover"
+                />
 
-            {isAdmin && <p>User: {booking?.user?.name}</p>}
-            {booking?.notes && <p>Notes: {booking.notes}</p>}
+                {/* DATE BADGE */}
+                <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-md px-3 py-1 rounded-lg text-xs text-white border border-white/10">
+                    {date}
+                </div>
 
-            {isAdmin && (
-                <>
-                    <button onClick={() => navigate(`/editbooking/${booking._id}`)}>
-                        Edit
-                    </button>
+                {/* PRICE */}
+                <div className="absolute bottom-3 right-3 bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-semibold">
+                    ₹{booking?.totalPrice}
+                </div>
+            </div>
 
-                    <button
-                        onClick={() => {
-                            onDelete?.(booking._id);
-                            showAlert("Booking deleted", "success");
-                        }}
+            {/* CONTENT */}
+            <div className="p-5">
+
+                {/* TITLE */}
+                <h3 className="text-lg font-semibold text-yellow-500">
+                    {booking?.service?.name}
+                </h3>
+
+                {/* CATEGORY + TIME */}
+                <p className="text-zinc-400 text-sm mt-1">
+                    {booking?.service?.category} • {booking?.time}
+                </p>
+
+                {/* STATUS */}
+                <div className="mt-3">
+                    <span
+                        className={`px-3 py-1 text-xs rounded-full font-medium
+                        ${booking?.status === "pending"
+                                ? "bg-yellow-900/30 text-yellow-400"
+                                : booking?.status === "confirmed"
+                                    ? "bg-green-900/30 text-green-400"
+                                    : booking?.status === "completed"
+                                        ? "bg-blue-900/30 text-blue-400"
+                                        : "bg-red-900/30 text-red-400"
+                            }`}
                     >
-                        Delete
-                    </button>
-                </>
-            )}
+                        {booking?.status}
+                    </span>
+                </div>
+
+                {/* NOTES */}
+                {booking?.notes && (
+                    <p className="text-zinc-500 text-sm mt-3 italic border-l border-yellow-500/30 pl-3">
+                        {booking.notes}
+                    </p>
+                )}
+
+                {/* ADMIN */}
+                {isAdmin && (
+                    <div className="flex gap-3 mt-5">
+                        <button
+                            onClick={() =>
+                                navigate(`/editbooking/${booking._id}`)
+                            }
+                            className="flex-1 py-2 rounded-lg bg-blue-700 hover:bg-blue-600 text-sm"
+                        >
+                            Edit
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                onDelete?.(booking._id);
+                                showAlert("Booking deleted", "success");
+                            }}
+                            className="flex-1 py-2 rounded-lg bg-red-700 hover:bg-red-600 text-sm"
+                        >
+                            Delete
+                        </button>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

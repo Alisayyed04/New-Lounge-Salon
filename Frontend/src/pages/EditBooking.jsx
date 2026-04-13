@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
@@ -19,7 +18,6 @@ export default function EditBooking() {
         notes: "",
     });
 
-    // ✅ GENERATE SLOTS
     const generateTimeSlots = (start = 9, end = 20, interval = 60) => {
         const slots = [];
         for (let hour = start; hour < end; hour++) {
@@ -34,7 +32,6 @@ export default function EditBooking() {
 
     const allSlots = generateTimeSlots();
 
-    // ✅ FETCH BOOKING
     useEffect(() => {
         const fetchBooking = async () => {
             const token = localStorage.getItem("token");
@@ -77,7 +74,6 @@ export default function EditBooking() {
         fetchBooking();
     }, [id]);
 
-    // ✅ FETCH BOOKED SLOTS
     useEffect(() => {
         const fetchSlots = async () => {
             if (!formData.date) return;
@@ -117,7 +113,6 @@ export default function EditBooking() {
         fetchSlots();
     }, [formData.date]);
 
-    // ✅ VALIDATION (STRICT)
     const validateForm = () => {
         if (!formData.date) return "Date is required";
         if (!formData.time) return "Time is required";
@@ -145,7 +140,6 @@ export default function EditBooking() {
         return null;
     };
 
-    // ✅ PAST TIME CHECK
     const isPastTime = (slot) => {
         if (!formData.date) return false;
 
@@ -158,7 +152,6 @@ export default function EditBooking() {
         return slot <= currentTime;
     };
 
-    // ✅ HANDLE CHANGE
     const handleChange = (e) => {
         setFormData((prev) => ({
             ...prev,
@@ -166,7 +159,6 @@ export default function EditBooking() {
         }));
     };
 
-    // ✅ SUBMIT
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -209,90 +201,133 @@ export default function EditBooking() {
         }
     };
 
-    if (loading) return <h2>Loading...</h2>;
+    if (loading)
+        return (
+            <div className="text-center text-zinc-400 mt-20">
+                Loading...
+            </div>
+        );
 
     return (
-        <div>
-            <h2>Edit Booking</h2>
+        <section className="text-white px-6 py-20 max-w-4xl mx-auto">
 
-            <form onSubmit={handleSubmit}>
-                <label>Date</label>
-                <input
-                    type="date"
-                    name="date"
-                    value={formData.date}
-                    onChange={handleChange}
-                />
+            {/* HEADER */}
+            <div className="text-center mb-10">
+                <h2 className="text-3xl font-semibold">
+                    <span className="bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                        Edit Booking
+                    </span>
+                </h2>
+            </div>
 
-                <br />
+            {/* FORM */}
+            <form
+                onSubmit={handleSubmit}
+                className="bg-gradient-to-b from-[#111] to-[#0a0a0a]
+                border border-white/10
+                backdrop-blur-xl
+                rounded-2xl
+                p-8
+                shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
+            >
 
-                <label>Time</label>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-                    {allSlots.map((slot) => {
-                        const isBooked = bookedSlots.includes(slot);
-                        const isPast = isPastTime(slot);
-                        const disabled = isBooked || isPast;
-
-                        return (
-                            <button
-                                type="button"
-                                key={slot}
-                                disabled={disabled}
-                                onClick={() =>
-                                    setFormData((prev) => ({
-                                        ...prev,
-                                        time: slot,
-                                    }))
-                                }
-                                style={{
-                                    padding: "10px",
-                                    background:
-                                        formData.time === slot
-                                            ? "black"
-                                            : "lightgray",
-                                    color:
-                                        formData.time === slot
-                                            ? "white"
-                                            : "black",
-                                    opacity: disabled ? 0.5 : 1,
-                                    cursor: disabled
-                                        ? "not-allowed"
-                                        : "pointer",
-                                }}
-                            >
-                                {slot}
-                            </button>
-                        );
-                    })}
+                {/* DATE */}
+                <div className="mb-6">
+                    <label className="block text-sm text-zinc-400 mb-2">
+                        Date
+                    </label>
+                    <input
+                        type="date"
+                        name="date"
+                        value={formData.date}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 rounded-lg bg-black border border-white/10 text-white focus:border-yellow-500"
+                    />
                 </div>
 
-                <br />
+                {/* TIME */}
+                <div className="mb-6">
+                    <label className="block text-sm text-zinc-400 mb-3">
+                        Time Slot
+                    </label>
 
-                <label>Notes</label>
-                <textarea
-                    name="notes"
-                    value={formData.notes}
-                    onChange={handleChange}
-                />
+                    <div className="flex flex-wrap gap-3">
+                        {allSlots.map((slot) => {
+                            const isBooked = bookedSlots.includes(slot);
+                            const isPast = isPastTime(slot);
+                            const disabled = isBooked || isPast;
 
-                <br />
+                            return (
+                                <button
+                                    type="button"
+                                    key={slot}
+                                    disabled={disabled}
+                                    onClick={() =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            time: slot,
+                                        }))
+                                    }
+                                    className={`px-4 py-2 rounded-lg text-sm transition
+                                        ${formData.time === slot
+                                            ? "bg-yellow-500 text-black"
+                                            : "bg-black border border-white/10 text-zinc-300"
+                                        }
+                                        ${disabled
+                                            ? "opacity-40 cursor-not-allowed"
+                                            : "hover:border-yellow-500"
+                                        }`}
+                                >
+                                    {slot}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
 
-                <label>Status</label>
-                <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
+                {/* NOTES */}
+                <div className="mb-6">
+                    <label className="block text-sm text-zinc-400 mb-2">
+                        Notes
+                    </label>
+                    <textarea
+                        name="notes"
+                        value={formData.notes}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 rounded-lg bg-black border border-white/10 text-white focus:border-yellow-500"
+                    />
+                </div>
+
+                {/* STATUS */}
+                <div className="mb-6">
+                    <label className="block text-sm text-zinc-400 mb-2">
+                        Status
+                    </label>
+                    <select
+                        name="status"
+                        value={formData.status}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 rounded-lg bg-black border border-white/10 text-white focus:border-yellow-500"
+                    >
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+
+                {/* BUTTON */}
+                <button
+                    type="submit"
+                    className="w-full py-3 rounded-xl 
+                    bg-gradient-to-r from-red-900 to-red-700 
+                    hover:from-red-800 hover:to-red-600 
+                    transition shadow-lg"
                 >
-                    <option value="pending">Pending</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
+                    Update Booking
+                </button>
 
-                <br />
-
-                <button type="submit">Update Booking</button>
             </form>
-        </div>
+        </section>
     );
 }

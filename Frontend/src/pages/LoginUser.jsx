@@ -12,7 +12,6 @@ export default function LoginUser({ setUser }) {
         password: "",
     });
 
-    // ✅ HANDLE INPUT
     const handleFormData = (e) => {
         setFormData((d) => ({
             ...d,
@@ -20,7 +19,6 @@ export default function LoginUser({ setUser }) {
         }));
     };
 
-    // ✅ VALIDATION
     const validateForm = () => {
         if (!formData.email.trim()) return "Email is required";
 
@@ -34,7 +32,6 @@ export default function LoginUser({ setUser }) {
         return null;
     };
 
-    // ✅ SUBMIT
     const handleForm = async (e) => {
         e.preventDefault();
 
@@ -75,35 +72,95 @@ export default function LoginUser({ setUser }) {
     };
 
     return (
-        <>
-            <form onSubmit={handleForm}>
-                <label htmlFor="email">Email</label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Enter Your Email"
-                    value={formData.email}
-                    onChange={handleFormData}
-                    required
-                />
-                <br />
+        <section className="min-h-screen flex items-center pt-20 justify-center px-6 text-white ">
 
-                <label htmlFor="pass">Password</label>
-                <input
-                    type="password"
-                    id="pass"
-                    name="password"
-                    required
-                    onChange={handleFormData}
-                    placeholder="Enter Password"
-                    value={formData.password}
-                    minLength="6"
-                />
-                <br />
+            <div className="w-full max-w-md">
 
-                <button type="submit">Submit</button>
-            </form>
-        </>
+                {/* TITLE */}
+                <div className="text-center mb-10">
+                    <h1 className="text-3xl font-semibold">
+                        <span className="bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                            Welcome Back
+                        </span>
+                    </h1>
+                    <p className="text-zinc-400 text-sm mt-2">
+                        Login to continue your experience
+                    </p>
+                </div>
+
+                {/* FORM CARD */}
+                <form
+                    onSubmit={handleForm}
+                    className="bg-gradient-to-b from-[#111] to-[#0a0a0a] 
+                    border border-white/10 
+                    backdrop-blur-xl 
+                    rounded-2xl 
+                    p-8 
+                    shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
+                >
+
+                    {/* EMAIL */}
+                    <div className="mb-6">
+                        <label className="block text-sm text-zinc-400 mb-2">
+                            Email
+                        </label>
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Enter your email"
+                            value={formData.email}
+                            onChange={handleFormData}
+                            className="w-full px-4 py-3 rounded-lg 
+                            bg-black border border-white/10 
+                            text-white placeholder-zinc-500
+                            focus:outline-none focus:border-yellow-500 transition"
+                        />
+                    </div>
+
+                    {/* PASSWORD */}
+                    <div className="mb-8">
+                        <label className="block text-sm text-zinc-400 mb-2">
+                            Password
+                        </label>
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            value={formData.password}
+                            onChange={handleFormData}
+                            className="w-full px-4 py-3 rounded-lg 
+                            bg-black border border-white/10 
+                            text-white placeholder-zinc-500
+                            focus:outline-none focus:border-yellow-500 transition"
+                        />
+                    </div>
+
+                    {/* BUTTON */}
+                    <button
+                        type="submit"
+                        className="w-full py-3 rounded-xl 
+                        bg-gradient-to-r from-red-900 to-red-700 
+                        hover:from-red-800 hover:to-red-600 
+                        text-white font-medium 
+                        transition shadow-lg"
+                    >
+                        Login
+                    </button>
+
+                </form>
+
+                {/* FOOTER */}
+                <p className="text-center text-zinc-500 text-sm mt-6">
+                    Don’t have an account?{" "}
+                    <span
+                        onClick={() => navigate("/register")}
+                        className="text-yellow-500 cursor-pointer hover:underline"
+                    >
+                        Register
+                    </span>
+                </p>
+
+            </div>
+        </section>
     );
 }

@@ -15,6 +15,7 @@ import AdminSidebar from "./components/AdminSidebar.jsx";
 
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { useState } from "react";
+import ScrollToTop from "./components/ScrollToTop.jsx";
 
 import Admin from "./pages/Admin.jsx";
 import Home from "./pages/Home.jsx";
@@ -48,7 +49,9 @@ function App() {
           padding: "20px"
         }}
       >
+        <ScrollToTop />
         <Routes>
+
           {/* PUBLIC */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<LoginUser setUser={setUser} />} />

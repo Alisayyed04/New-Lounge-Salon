@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(circle at top, rgba(120, 0, 0, 0.2), transparent 40%),
+    radial-gradient(
+      circle at bottom,
+      rgba(212, 175, 55, 0.05),
+      transparent 50%
+    ),
+    linear-gradient(to bottom, #000000, #0a0a0a, #000000);
+  color: white;
+  min-height: 100vh;
+}

@@ -10,10 +10,9 @@ export const AlertProvider = ({ children }) => {
         setAlert({ message, type });
         setVisible(true);
 
-        // hide after 3s
         setTimeout(() => {
             setVisible(false);
-            setTimeout(() => setAlert(null), 300); // wait for animation
+            setTimeout(() => setAlert(null), 300);
         }, 3000);
     };
 
@@ -23,24 +22,40 @@ export const AlertProvider = ({ children }) => {
 
             {alert && (
                 <div
-                    className={`fixed top-5 right-5 z-50 transition-all duration-300 ${visible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5"
-                        }`}
+                    className={`fixed top-6 right-6 z-[9999] transition-all duration-300
+                    ${visible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5"}`}
                 >
-                    <div>
-                        <span>
+                    <div
+                        className={`flex items-center gap-4 px-5 py-4 rounded-xl
+                        backdrop-blur-xl border shadow-[0_10px_40px_rgba(0,0,0,0.6)]
+                        
+                        ${alert.type === "error"
+                                ? "bg-red-900/30 border-red-500/30 text-red-300"
+                                : "bg-green-900/30 border-green-500/30 text-green-300"
+                            }`}
+                    >
+
+                        {/* ICON */}
+                        <div className="text-xl">
                             {alert.type === "error" ? "❌" : "✅"}
-                        </span>
+                        </div>
 
-                        <p>{alert.message}</p>
+                        {/* MESSAGE */}
+                        <p className="text-sm font-medium tracking-wide">
+                            {alert.message}
+                        </p>
 
-                        <button onClick={() => setVisible(false)}>
-                            ✖
+                        {/* CLOSE */}
+                        <button
+                            onClick={() => setVisible(false)}
+                            className="ml-2 text-sm opacity-70 hover:opacity-100 transition"
+                        >
+                            ✕
                         </button>
                     </div>
                 </div>
             )}
-
-        </AlertContext.Provider >
+        </AlertContext.Provider>
     );
 };
 

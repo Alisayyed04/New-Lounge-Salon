@@ -19,14 +19,12 @@ export default function EditService() {
     const [imageFile, setImageFile] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // 🔒 Logout helper
     const handleLogout = (() => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         navigate("/login");
     }, [navigate]);
 
-    // ✅ AUTH + FETCH (FIXED)
     useEffect(() => {
         const init = async () => {
             const user = JSON.parse(localStorage.getItem("user"));
@@ -79,7 +77,6 @@ export default function EditService() {
         init();
     }, []);
 
-    // ✅ HANDLE INPUT
     const handleChange = (e) => {
         const { name, value, files } = e.target;
 
@@ -93,7 +90,6 @@ export default function EditService() {
         }
     };
 
-    // ✅ STRICT VALIDATION
     const validateForm = () => {
         if (!formData.name.trim()) return "Name is required";
         if (formData.name.length < 3) return "Name too short";
@@ -136,7 +132,6 @@ export default function EditService() {
         return null;
     };
 
-    // ✅ SUBMIT
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -193,71 +188,147 @@ export default function EditService() {
         }
     };
 
-    if (loading) return <h2>Loading...</h2>;
+    if (loading)
+        return (
+            <div className="text-center text-zinc-400 mt-20">
+                Loading...
+            </div>
+        );
 
     return (
-        <div>
-            <h2>Edit Service (Admin)</h2>
+        <section className="text-white px-6 py-20 max-w-4xl mx-auto">
 
-            <form onSubmit={handleSubmit}>
-                <input
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Service Name"
-                />
+            {/* HEADER */}
+            <div className="text-center mb-10">
+                <h2 className="text-3xl font-semibold">
+                    <span className="bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                        Edit Service
+                    </span>
+                </h2>
+                <p className="text-zinc-400 text-sm mt-2">
+                    Update your service details
+                </p>
+            </div>
 
-                <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    placeholder="Description"
-                />
+            {/* FORM CARD */}
+            <form
+                onSubmit={handleSubmit}
+                className="bg-gradient-to-b from-[#111] to-[#0a0a0a]
+                border border-white/10 
+                backdrop-blur-xl 
+                rounded-2xl 
+                p-8 
+                shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
+            >
 
-                <input
-                    name="price"
-                    type="number"
-                    value={formData.price}
-                    onChange={handleChange}
-                    placeholder="Price"
-                />
+                <div className="grid md:grid-cols-2 gap-6">
 
-                <input
-                    name="duration"
-                    type="number"
-                    value={formData.duration}
-                    onChange={handleChange}
-                    placeholder="Duration"
-                />
+                    {/* NAME */}
+                    <div>
+                        <label className="block text-sm text-zinc-400 mb-2">
+                            Service Name
+                        </label>
+                        <input
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 rounded-lg bg-black border border-white/10 text-white focus:border-yellow-500"
+                        />
+                    </div>
 
-                <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
+                    {/* CATEGORY */}
+                    <div>
+                        <label className="block text-sm text-zinc-400 mb-2">
+                            Category
+                        </label>
+                        <select
+                            name="category"
+                            value={formData.category}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 rounded-lg bg-black border border-white/10 text-white focus:border-yellow-500"
+                        >
+                            <option value="">Select Category</option>
+                            <option value="hair">Hair</option>
+                            <option value="haircut">Haircut</option>
+                            <option value="skin & facial">Skin & Facial</option>
+                            <option value="coloring">Coloring</option>
+                            <option value="nails">Nails</option>
+                            <option value="waxing">Waxing</option>
+                            <option value="makeup">Makeup</option>
+                            <option value="threading">Threading</option>
+                            <option value="bridal">Bridal</option>
+                        </select>
+                    </div>
+
+                    {/* PRICE */}
+                    <div>
+                        <label className="block text-sm text-zinc-400 mb-2">
+                            Price (₹)
+                        </label>
+                        <input
+                            name="price"
+                            type="number"
+                            value={formData.price}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 rounded-lg bg-black border border-white/10 text-white focus:border-yellow-500"
+                        />
+                    </div>
+
+                    {/* DURATION */}
+                    <div>
+                        <label className="block text-sm text-zinc-400 mb-2">
+                            Duration (mins)
+                        </label>
+                        <input
+                            name="duration"
+                            type="number"
+                            value={formData.duration}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 rounded-lg bg-black border border-white/10 text-white focus:border-yellow-500"
+                        />
+                    </div>
+
+                </div>
+
+                {/* DESCRIPTION */}
+                <div className="mt-6">
+                    <label className="block text-sm text-zinc-400 mb-2">
+                        Description
+                    </label>
+                    <textarea
+                        name="description"
+                        value={formData.description}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 rounded-lg bg-black border border-white/10 text-white focus:border-yellow-500"
+                    />
+                </div>
+
+                {/* IMAGE */}
+                <div className="mt-6">
+                    <label className="block text-sm text-zinc-400 mb-2">
+                        Update Image (optional)
+                    </label>
+                    <input
+                        type="file"
+                        name="image"
+                        accept="image/*"
+                        onChange={handleChange}
+                        className="w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-zinc-800 file:text-white hover:file:bg-zinc-700"
+                    />
+                </div>
+
+                {/* BUTTON */}
+                <button
+                    type="submit"
+                    className="w-full mt-8 py-3 rounded-xl 
+                    bg-gradient-to-r from-red-900 to-red-700 
+                    hover:from-red-800 hover:to-red-600 
+                    transition shadow-lg"
                 >
+                    Update Service
+                </button>
 
-                    <option value="">Select Category</option>
-                    <option value="hair">Hair</option>
-                    <option value="haircut">Haircut</option>
-                    <option value="skin & facial">Skin & Facial </option>
-                    <option value="coloring">Coloring</option>
-                    <option value="nails">Nails</option>
-                    <option value="waxing">Waxing</option>
-                    <option value="makeup">Makeup</option>
-                    <option value="threading">Threading</option>
-                    <option value="bridal">Bridal</option>
-                </select>
-
-                {/* 🔥 IMAGE UPDATE */}
-                <input
-                    type="file"
-                    name="image"
-                    accept="image/*"
-                    onChange={handleChange}
-                />
-
-                <button type="submit">Update Service</button>
             </form>
-        </div>
+        </section>
     );
 }

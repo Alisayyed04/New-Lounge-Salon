@@ -64,22 +64,41 @@ export default function AdminBookings() {
     };
 
     return (
-        <>
-            <h2>All Bookings (Admin)</h2>
+        <section className="relative text-white px-6 py-16 max-w-7xl mx-auto">
 
+            {/* HEADER */}
+            <div className="mb-10">
+                <h2 className="text-3xl font-semibold">
+                    <span className="bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                        All Bookings
+                    </span>
+                </h2>
+                <p className="text-zinc-400 mt-2 text-sm">
+                    Manage and monitor all customer bookings
+                </p>
+            </div>
+
+            {/* CONTENT */}
             {loading ? (
-                <p>Loading...</p>
+                <div className="text-zinc-500 text-center py-20">
+                    Loading bookings...
+                </div>
             ) : data.length === 0 ? (
-                <p>No bookings found</p>
+                <div className="text-zinc-500 text-center py-20">
+                    No bookings found
+                </div>
             ) : (
-                data.map((booking) => (
-                    <BookingCard
-                        key={booking._id}
-                        booking={booking}
-                        onDelete={handleDelete}
-                    />
-                ))
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {data.map((booking) => (
+                        <BookingCard
+                            key={booking._id}
+                            booking={booking}
+                            onDelete={handleDelete}
+                        />
+                    ))}
+                </div>
             )}
-        </>
+
+        </section>
     );
 }

@@ -80,41 +80,118 @@ export default function CreateAdmin() {
     };
 
     return (
-        <div>
-            <h2>Create Admin</h2>
+        <section className="relative text-white px-6 py-20 max-w-3xl mx-auto">
 
-            <form onSubmit={handleSubmit}>
-                <input
-                    name="name"
-                    placeholder="Name"
-                    value={formData.name}
-                    onChange={handleChange}
-                />
+            {/* HEADER */}
+            <div className="text-center mb-10">
+                <h2 className="text-3xl font-semibold">
+                    <span className="bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                        Create Admin
+                    </span>
+                </h2>
+                <p className="text-zinc-400 text-sm mt-2">
+                    Add a new administrator to the system
+                </p>
+            </div>
 
-                <input
-                    name="email"
-                    placeholder="Email"
-                    value={formData.email}
-                    onChange={handleChange}
-                />
+            {/* FORM CARD */}
+            <form
+                onSubmit={handleSubmit}
+                className="bg-gradient-to-b from-[#111] to-[#0a0a0a] 
+                border border-white/10 
+                backdrop-blur-xl 
+                rounded-2xl 
+                p-8 
+                shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
+            >
 
-                <input
-                    name="password"
-                    placeholder="Password"
-                    type="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                />
+                <div className="space-y-6">
 
-                <input
-                    name="phone"
-                    placeholder="Phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                />
+                    {/* NAME */}
+                    <div>
+                        <label className="block text-sm text-zinc-400 mb-2">
+                            Name
+                        </label>
+                        <input
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            placeholder="Enter name"
+                            className="w-full px-4 py-3 rounded-lg 
+                            bg-black border border-white/10 
+                            text-white placeholder-zinc-500
+                            focus:outline-none focus:border-yellow-500"
+                        />
+                    </div>
 
-                <button type="submit">Create Admin</button>
+                    {/* EMAIL */}
+                    <div>
+                        <label className="block text-sm text-zinc-400 mb-2">
+                            Email
+                        </label>
+                        <input
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="Enter email"
+                            className="w-full px-4 py-3 rounded-lg 
+                            bg-black border border-white/10 
+                            text-white placeholder-zinc-500
+                            focus:outline-none focus:border-yellow-500"
+                        />
+                    </div>
+
+                    {/* PASSWORD */}
+                    <div>
+                        <label className="block text-sm text-zinc-400 mb-2">
+                            Password
+                        </label>
+                        <input
+                            name="password"
+                            type="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            placeholder="Enter password"
+                            className="w-full px-4 py-3 rounded-lg 
+                            bg-black border border-white/10 
+                            text-white placeholder-zinc-500
+                            focus:outline-none focus:border-yellow-500"
+                        />
+                    </div>
+
+                    {/* PHONE */}
+                    <div>
+                        <label className="block text-sm text-zinc-400 mb-2">
+                            Phone (optional)
+                        </label>
+                        <input
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            placeholder="Enter phone number"
+                            className="w-full px-4 py-3 rounded-lg 
+                            bg-black border border-white/10 
+                            text-white placeholder-zinc-500
+                            focus:outline-none focus:border-yellow-500"
+                        />
+                    </div>
+
+                </div>
+
+                {/* BUTTON */}
+                <button
+                    type="submit"
+                    className="w-full mt-8 py-3 rounded-xl 
+                    bg-gradient-to-r from-red-900 to-red-700 
+                    hover:from-red-800 hover:to-red-600 
+                    text-white font-medium 
+                    transition shadow-lg"
+                >
+                    Create Admin
+                </button>
+
             </form>
-        </div>
+
+        </section>
     );
 }
