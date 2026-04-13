@@ -35,7 +35,7 @@ function App() {
   });
   return (
     <BrowserRouter>
-      <Navbar setUser={setUser} />
+      <Navbar user={user} setUser={setUser} />
 
       {user?.role === "admin" && (
         <AdminSidebar isOpen={isOpen} setIsOpen={setIsOpen} setUser={setUser} />

@@ -50,7 +50,9 @@ export default function Services() {
 
         // Category filter
         if (category !== "all") {
-            temp = temp.filter((s) => s.category === category);
+            temp = temp.filter(
+                (s) => s.category.toLowerCase().trim() === category
+            );
         }
 
         // Sorting
@@ -64,7 +66,7 @@ export default function Services() {
     }, [search, category, sort, data]);
 
     // Get unique categories
-    const categories = ["all", ...new Set(data.map((s) => s.category))];
+    const categories = ["all", ...new Set(data.map((s) => s.category.toLowerCase().trim())),];
 
     return (
         <div style={{ padding: "20px" }}>

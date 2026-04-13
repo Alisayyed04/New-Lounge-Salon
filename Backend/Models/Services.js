@@ -25,7 +25,17 @@ const serviceSchema = new mongoose.Schema(
 
     category: {
       type: String,
-      enum: ["haircut", "coloring", "nails", "waxing", "makeup"],
+      enum: [
+        "hair",
+        "haircut",
+        "skin & facial",
+        "threading",
+        "bridal",
+        "coloring",
+        "nails",
+        "waxing",
+        "makeup",
+      ],
     },
 
     image: {

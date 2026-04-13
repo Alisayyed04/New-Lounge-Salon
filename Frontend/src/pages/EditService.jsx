@@ -109,7 +109,11 @@ export default function EditService() {
             return "Duration must be at least 5 mins";
 
         const validCategories = [
+            "hair",
             "haircut",
+            "skin & facial",
+            "threading",
+            "bridal",
             "coloring",
             "nails",
             "waxing",
@@ -172,7 +176,7 @@ export default function EditService() {
             );
 
             showAlert("Service updated successfully ✅", "success");
-            navigate("/");
+            navigate("/services");
         } catch (err) {
             if (
                 err.response?.status === 401 ||
@@ -231,12 +235,17 @@ export default function EditService() {
                     value={formData.category}
                     onChange={handleChange}
                 >
+
                     <option value="">Select Category</option>
+                    <option value="hair">Hair</option>
                     <option value="haircut">Haircut</option>
+                    <option value="skin & facial">Skin & Facial </option>
                     <option value="coloring">Coloring</option>
                     <option value="nails">Nails</option>
                     <option value="waxing">Waxing</option>
                     <option value="makeup">Makeup</option>
+                    <option value="threading">Threading</option>
+                    <option value="bridal">Bridal</option>
                 </select>
 
                 {/* 🔥 IMAGE UPDATE */}

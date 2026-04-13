@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema(
     profilePic: {
       type: String,
       default:
-        "https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg",
+        "https://res.cloudinary.com/dylin11ku/image/upload/q_auto/f_auto/v1776001972/Default-Profile-Picture-Download-PNG-Image_wvetgl.webp",
     },
 
     bookings: [

@@ -52,7 +52,17 @@ export default function CreateService() {
         if (!formData.duration || formData.duration < 5)
             return "Duration must be at least 5 mins";
 
-        const validCategories = ["haircut", "coloring", "nails", "waxing", "makeup"];
+        const validCategories = [
+            "hair",
+            "haircut",
+            "skin & facial",
+            "coloring",
+            "nails",
+            "waxing",
+            "makeup",
+            "threading",
+            "bridal"
+        ];
         if (!validCategories.includes(formData.category))
             return "Invalid category";
 
@@ -145,11 +155,15 @@ export default function CreateService() {
 
                 <select name="category" onChange={handleChange} required>
                     <option value="">Select Category</option>
+                    <option value="hair">Hair</option>
                     <option value="haircut">Haircut</option>
+                    <option value="skin & facial">Skin & Facial </option>
                     <option value="coloring">Coloring</option>
                     <option value="nails">Nails</option>
                     <option value="waxing">Waxing</option>
                     <option value="makeup">Makeup</option>
+                    <option value="threading">Threading</option>
+                    <option value="bridal">Bridal</option>
                 </select>
 
                 <input
