@@ -15,15 +15,13 @@ import { logger, notFound } from "./Middlewares/authMiddleware.js";
 const app = express();
 const PORT = process.env.PORT || 8080;
 // 🔴 MIDDLEWARES
-app.use(express.json());
-const allowedOrigins = ["http://localhost:5173", process.env.FRONTEND_URL];
-
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: ["http://localhost:5173", /\.vercel\.app$/],
     credentials: true,
   }),
 );
+app.use(express.json());
 app.use(logger);
 
 // 🔴 ROUTES
