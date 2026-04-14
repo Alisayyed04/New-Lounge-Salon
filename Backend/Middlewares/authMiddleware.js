@@ -24,7 +24,7 @@ export const protect = async (req, res, next) => {
 
     next();
   } catch (error) {
-    next(new AppError("Token failed", 401));
+    next(new AppError("Please Login to book a service", 401));
   }
 };
 

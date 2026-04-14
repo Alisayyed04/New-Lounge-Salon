@@ -1,6 +1,6 @@
 export default function Contact() {
 
-    const phone = "919156888532";
+    const phone = "918766613766";
     const insta = "https://instagram.com/shamaa_makeup_artist";
     const email = "alisayyed125540@gmail.com";
 
