@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import Booking from "../Models/Booking.js";
 import { AppError } from "../utils/AppError.js";
+
 export const createBooking = asyncHandler(async (req, res) => {
   const { service, date, time, totalPrice, notes } = req.body;
 
@@ -8,6 +9,14 @@ export const createBooking = asyncHandler(async (req, res) => {
 
   if (!userId || !service || !date || !time) {
     throw new AppError("Please fill all the fields", 400);
+  }
+
+  // 🔥 BACKEND TIME VALIDATION (IMPORTANT)
+  const now = new Date();
+  const selectedDateTime = new Date(`${date}T${time}`);
+
+  if (selectedDateTime < now) {
+    throw new AppError("Cannot book a past time", 400);
   }
 
   const booking = await Booking.create({

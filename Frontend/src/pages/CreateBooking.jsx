@@ -65,13 +65,14 @@ export default function CreateBooking() {
         const now = new Date();
         const selectedDate = new Date(formData.date);
 
+        // Only check time if same day
         if (selectedDate.toDateString() !== now.toDateString()) {
             return false;
         }
 
         const [h, m] = slot.split(":");
-        const slotDate = new Date();
-        slotDate.setHours(h, m, 0);
+        const slotDate = new Date(selectedDate);
+        slotDate.setHours(h, m, 0, 0);
 
         return slotDate < now;
     };
@@ -112,7 +113,7 @@ export default function CreateBooking() {
                 }
             );
 
-            showAlert("Booking request sent. Waiting for approval.", "success");
+            showAlert("Booking request sent. Call us if you are in a Hurry!", "success");
             navigate(`/booking/${res.data.data._id}`);
         } catch (err) {
             showAlert(
