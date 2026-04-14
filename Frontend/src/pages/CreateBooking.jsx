@@ -123,6 +123,7 @@ New Booking!
 Name: ${bookingData.user?.name}
 Phone: ${bookingData.user?.phone}
 Service: ${bookingData.service?.name}
+Price: ₹${bookingData.totalPrice}
 Date: ${bookingData.date?.split("T")[0]}
 Time: ${bookingData.time}
 `;
