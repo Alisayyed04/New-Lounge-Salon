@@ -161,7 +161,14 @@ export default function AdminDashboard() {
                         <p className="text-zinc-400 text-sm">
                             {b.user?.name}
                         </p>
-
+                        <p className="text-zinc-400 text-sm">
+                            <a
+                                href={`tel:${b.user?.phone}`}
+                                className="text-yellow-400 text-sm hover:underline"
+                            >
+                                📞 {b.user?.phone || "No phone"}
+                            </a>
+                        </p>
                         <p className="text-zinc-400 text-sm">
                             {b.date?.split("T")[0]} | {b.time}
                         </p>

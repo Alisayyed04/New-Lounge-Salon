@@ -6,7 +6,7 @@ export const getBookings = asyncHandler(async (req, res) => {
   const bookings = await Booking.find()
     .populate({
       path: "user",
-      select: "name email",
+      select: "name email phone",
     })
     .populate({
       path: "service",
