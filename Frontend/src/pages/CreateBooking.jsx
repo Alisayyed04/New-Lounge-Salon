@@ -78,6 +78,7 @@ export default function CreateBooking() {
     };
 
     // ✅ SUBMIT (REQUEST BOOKING)
+    // ✅ SUBMIT (REQUEST BOOKING)
     const handleForm = async (e) => {
         e.preventDefault();
 
@@ -104,7 +105,7 @@ export default function CreateBooking() {
                 {
                     ...formData,
                     service: ID,
-                    status: "pending", // 🔥 important
+                    status: "pending",
                 },
                 {
                     headers: {
@@ -113,15 +114,40 @@ export default function CreateBooking() {
                 }
             );
 
-            showAlert("Booking request sent. Call us if you are in a Hurry!", "success");
-            navigate(`/booking/${res.data.data._id}`);
+            const bookingData = res.data.data;
+
+            // ✅ WhatsApp Message
+            const message = `
+New Booking!
+
+Name: ${bookingData.user?.name}
+Phone: ${bookingData.user?.phone}
+Service: ${bookingData.service?.name}
+Date: ${bookingData.date?.split("T")[0]}
+Time: ${bookingData.time}
+`;
+
+            const adminNumber = "918766613766"; // 🔥 replace with your number
+
+            const whatsappURL = `https://wa.me/${adminNumber}?text=${encodeURIComponent(message)}`;
+
+            // ✅ Open WhatsApp FIRST (better UX)
+            window.open(whatsappURL, "_blank");
+
+            // ✅ Then show success + navigate
+            showAlert(
+                "Booking request sent. WhatsApp message opened!",
+                "success"
+            );
+
+            navigate(`/booking/${bookingData._id}`);
+
         } catch (err) {
             showAlert(
                 err.response?.data?.message || "Failed to create booking"
             );
         }
     };
-
     // ✅ IMAGE FIX
     const getImage = () => {
         if (serviceData?.image?.url) return serviceData.image.url;
