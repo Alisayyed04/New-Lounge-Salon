@@ -53,7 +53,7 @@ Preferred Time:
 
                 <div className="bg-zinc-900 p-6 rounded-xl text-center">
                     <h3 className="text-xl font-semibold text-yellow-500 mb-2">📞 Call Us</h3>
-                    <p className="text-gray-400">+91 9156888532</p>
+                    <p className="text-gray-400">+91 8766613766</p>
                 </div>
 
                 <div className="bg-zinc-900 p-6 rounded-xl text-center">

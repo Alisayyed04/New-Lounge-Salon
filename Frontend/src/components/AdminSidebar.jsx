@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 export default function AdminSidebar({ isOpen, setIsOpen }) {
     return (
         <>
-            {/* OVERLAY (BLUR BACKGROUND) */}
+            {/* OVERLAY */}
             {isOpen && (
                 <div
                     onClick={() => setIsOpen(false)}
@@ -27,31 +27,41 @@ export default function AdminSidebar({ isOpen, setIsOpen }) {
                     <ul className="space-y-4 text-zinc-300 text-sm">
 
                         <li>
-                            <Link to="/admin/dashboard" className="hover:text-yellow-500 transition">
+                            <Link to="/admin/dashboard"
+                                onClick={() => setIsOpen(false)}
+                                className="hover:text-yellow-500 transition">
                                 Dashboard
                             </Link>
                         </li>
 
                         <li>
-                            <Link to="/admin/create" className="hover:text-yellow-500 transition">
+                            <Link to="/admin/create"
+                                onClick={() => setIsOpen(false)}
+                                className="hover:text-yellow-500 transition">
                                 Create Admin
                             </Link>
                         </li>
 
                         <li>
-                            <Link to="/createservice" className="hover:text-yellow-500 transition">
+                            <Link to="/createservice"
+                                onClick={() => setIsOpen(false)}
+                                className="hover:text-yellow-500 transition">
                                 Create Service
                             </Link>
                         </li>
 
                         <li>
-                            <Link to="/services" className="hover:text-yellow-500 transition">
+                            <Link to="/services"
+                                onClick={() => setIsOpen(false)}
+                                className="hover:text-yellow-500 transition">
                                 Edit Service
                             </Link>
                         </li>
 
                         <li>
-                            <Link to="/admin/bookings" className="hover:text-yellow-500 transition">
+                            <Link to="/admin/bookings"
+                                onClick={() => setIsOpen(false)}
+                                className="hover:text-yellow-500 transition">
                                 All Bookings
                             </Link>
                         </li>
@@ -60,15 +70,17 @@ export default function AdminSidebar({ isOpen, setIsOpen }) {
                 </div>
             </div>
 
-            {/* TOGGLE BUTTON */}
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="fixed top-5 left-5 z-50 px-3 py-2 rounded-lg 
-                bg-black/60 backdrop-blur-md border border-white/10 
-                text-white hover:border-yellow-500 transition"
-            >
-                {isOpen ? "✕" : "☰"}
-            </button>
+            {/* TOGGLE BUTTON (ONLY WHEN CLOSED) */}
+            {!isOpen && (
+                <button
+                    onClick={() => setIsOpen(true)}
+                    className="fixed top-5 left-5 z-50 px-3 py-2 rounded-lg 
+                    bg-black/60 backdrop-blur-md border border-white/10 
+                    text-white hover:border-yellow-500 transition"
+                >
+                    ☰
+                </button>
+            )}
         </>
     );
 }

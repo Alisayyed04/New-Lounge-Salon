@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAlert } from "../context/AlertContext";
 import API from "../config/api";
+
 export default function CreateBooking() {
     const navigate = useNavigate();
     const { id: ID } = useParams();
@@ -11,7 +12,6 @@ export default function CreateBooking() {
     const today = new Date().toISOString().split("T")[0];
 
     const [serviceData, setServiceData] = useState({});
-    const [bookedSlots, setBookedSlots] = useState([]);
 
     const [formData, setFormData] = useState({
         date: "",
@@ -20,6 +20,7 @@ export default function CreateBooking() {
         totalPrice: 0,
     });
 
+    // 🔥 Generate slots (unchanged)
     const generateTimeSlots = (start = 9, end = 20, interval = 60) => {
         const slots = [];
         for (let hour = start; hour < end; hour++) {
@@ -38,13 +39,8 @@ export default function CreateBooking() {
     useEffect(() => {
         const getService = async () => {
             try {
-                const res = await axios.get(
-                    `${API}/api/services/${ID}`
-                );
-
+                const res = await axios.get(`${API}/api/services/${ID}`);
                 const service = res.data.data;
-
-                console.log("SERVICE DATA 👉", service); // DEBUG
 
                 setServiceData(service);
 
@@ -62,44 +58,7 @@ export default function CreateBooking() {
         getService();
     }, [ID]);
 
-    // ✅ FETCH BOOKED SLOTS
-    useEffect(() => {
-        const fetchSlots = async () => {
-            if (!formData.date) return;
-
-            try {
-                const res = await axios.get(
-                    `${API}/api/bookings/slots`,
-                    {
-                        params: { date: formData.date },
-                    }
-                );
-
-                const slots = Array.isArray(res.data) ? res.data : [];
-                setBookedSlots(slots);
-
-                const available = allSlots.find(
-                    (s) => !slots.includes(s)
-                );
-
-                if (available) {
-                    setFormData((prev) => ({
-                        ...prev,
-                        time: available,
-                    }));
-                }
-            } catch (err) {
-                showAlert(
-                    err.response?.data?.message ||
-                    "Failed to fetch available slots"
-                );
-            }
-        };
-
-        fetchSlots();
-    }, [formData.date]);
-
-    // ✅ BLOCK PAST TIME
+    // ✅ BLOCK PAST TIME ONLY
     const isPastTime = (slot) => {
         if (!formData.date) return false;
 
@@ -117,7 +76,7 @@ export default function CreateBooking() {
         return slotDate < now;
     };
 
-    // ✅ SUBMIT
+    // ✅ SUBMIT (REQUEST BOOKING)
     const handleForm = async (e) => {
         e.preventDefault();
 
@@ -134,11 +93,17 @@ export default function CreateBooking() {
         try {
             const token = localStorage.getItem("token");
 
+            if (!token) {
+                showAlert("Please login to book a service", "error");
+                return;
+            }
+
             const res = await axios.post(
                 `${API}/api/bookings/`,
                 {
                     ...formData,
                     service: ID,
+                    status: "pending", // 🔥 important
                 },
                 {
                     headers: {
@@ -147,7 +112,7 @@ export default function CreateBooking() {
                 }
             );
 
-            showAlert("Booking created successfully", "success");
+            showAlert("Booking request sent. Waiting for approval.", "success");
             navigate(`/booking/${res.data.data._id}`);
         } catch (err) {
             showAlert(
@@ -156,12 +121,11 @@ export default function CreateBooking() {
         }
     };
 
-    // ✅ GET IMAGE (CLOUDINARY FIX)
+    // ✅ IMAGE FIX
     const getImage = () => {
         if (serviceData?.image?.url) return serviceData.image.url;
         if (serviceData?.image) return serviceData.image;
         if (serviceData?.img) return serviceData.img;
-
         return "/photos/default-service.jpg";
     };
 
@@ -169,9 +133,8 @@ export default function CreateBooking() {
         <section className="text-white px-6 py-20 max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 gap-12">
 
-                {/* LEFT - SERVICE */}
+                {/* LEFT */}
                 <div className="bg-gradient-to-b from-[#111] to-[#0a0a0a] border border-white/5 rounded-2xl overflow-hidden shadow-xl group">
-
                     <div className="overflow-hidden">
                         <img
                             src={getImage()}
@@ -195,12 +158,11 @@ export default function CreateBooking() {
                     </div>
                 </div>
 
-                {/* RIGHT - FORM */}
+                {/* RIGHT */}
                 <form
                     onSubmit={handleForm}
                     className="bg-gradient-to-b from-[#111] to-[#0a0a0a] border border-white/5 rounded-2xl p-8 shadow-2xl"
                 >
-
                     {/* DATE */}
                     <div className="mb-6">
                         <label className="text-sm text-zinc-400">
@@ -225,10 +187,9 @@ export default function CreateBooking() {
                                     time: "",
                                 }));
                             }}
-                            onKeyDown={(e) => e.preventDefault()} // 🔒 block typing
-                            onFocus={(e) => e.target.showPicker()} // 🔥 force calendar
-                            className="w-full mt-2 px-4 py-3 rounded-xl bg-black border border-white/10 text-white 
-                            focus:outline-none focus:border-yellow-500 cursor-pointer"
+                            onKeyDown={(e) => e.preventDefault()}
+                            onFocus={(e) => e.target.showPicker()}
+                            className="w-full mt-2 px-4 py-3 rounded-xl bg-black border border-white/10 text-white"
                         />
                     </div>
 
@@ -240,9 +201,8 @@ export default function CreateBooking() {
 
                         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-3">
                             {allSlots.map((slot) => {
-                                const isBooked = bookedSlots.includes(slot);
                                 const isPast = isPastTime(slot);
-                                const disabled = isBooked || isPast;
+                                const disabled = isPast;
 
                                 return (
                                     <button
@@ -284,8 +244,7 @@ export default function CreateBooking() {
                                 notes: e.target.value,
                             }))
                         }
-                        className="w-full px-4 py-3 rounded-xl bg-black border border-white/10 text-white 
-                        focus:outline-none focus:border-yellow-500 mb-6"
+                        className="w-full px-4 py-3 rounded-xl bg-black border border-white/10 text-white mb-6"
                     />
 
                     {/* SUBMIT */}
@@ -293,11 +252,9 @@ export default function CreateBooking() {
                         type="submit"
                         disabled={!formData.date || !formData.time}
                         className="w-full py-3 rounded-xl bg-gradient-to-r from-red-900 to-red-700 
-                        hover:from-red-800 hover:to-red-600 
-                        disabled:opacity-40 disabled:cursor-not-allowed
-                        text-white font-semibold transition"
+                        disabled:opacity-40 text-white font-semibold transition"
                     >
-                        Confirm Booking
+                        Request Booking
                     </button>
                 </form>
             </div>

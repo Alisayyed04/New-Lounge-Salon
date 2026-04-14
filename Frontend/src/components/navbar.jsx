@@ -30,14 +30,35 @@ export default function Navbar({ user, setUser }) {
                     New Lounge
                 </Link>
 
-                {/* HAMBURGER */}
-                <button
-                    className="md:hidden text-white text-2xl"
-                    onClick={() => setMenuOpen(!menuOpen)}
-                >
-                    ☰
-                </button>
+                <div className="flex items-center gap-4 md:hidden">
+                    {/* 📱 WhatsApp */}
+                    <a
+                        href="https://wa.me/918766613766"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-green-500 text-xl"
+                    >
+                        <i className="ri-whatsapp-fill"></i>
+                    </a>
 
+                    {/* 📸 Instagram */}
+                    <a
+                        href="https://instagram.com/shamaa_makeup_artist"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-pink-500 text-xl"
+                    >
+                        <i className="ri-instagram-fill"></i>
+                    </a>
+
+                    {/* 🍔 Hamburger */}
+                    <button
+                        className="text-white text-2xl"
+                        onClick={() => setMenuOpen(!menuOpen)}
+                    >
+                        ☰
+                    </button>
+                </div>
                 {/* DESKTOP MENU */}
                 <ul className="hidden md:flex items-center gap-6 text-sm font-medium text-zinc-300">
 
