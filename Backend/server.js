@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 8080;
 // 🔴 MIDDLEWARES
 app.use(
   cors({
-    origin: ["http://localhost:5173", /\.vercel\.app$/],
+    origin: [/\.vercel\.app$/],
     credentials: true,
   }),
 );
